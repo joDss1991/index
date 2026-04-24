@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Estim. Vigne">
+<title>Estimation Récolte Viticole — Abeille Assurances</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Palette Abeille Assurances (charte officielle 2026) */
+    --abeille-jaune: #FED100;        /* Jaune signature vif — CTA, accents */
+    --abeille-jaune-fonce: #E6BC00;
+    --abeille-jaune-clr: #FFF8D9;    /* Jaune très pâle — fonds subtils */
+    --abeille-noir: #1A1A1A;         /* Noir profond — textes et titres */
+    --abeille-gris-fonce: #333333;
+    --abeille-gris: #6B7280;         /* Gris métadonnées */
+    --abeille-gris-clr: #F5F5F5;     /* Gris clair — fonds saisie */
+    --abeille-corail: #E74C3C;       /* Rouge corail — urgence/erreur */
+    --abeille-corail-clr: #FEEAE8;
+    --abeille-turquoise: #2DC4B6;    /* Turquoise — actions positives */
+    --abeille-turquoise-clr: #D6F5F1;
+    --abeille-vert: #1B9B6E;         /* Vert validé */
+    --abeille-vert-clr: #E3F5EC;
+    --abeille-orange: #E67E22;       /* Orange avertissement */
+    --abeille-orange-clr: #FDF2E6;
+    --abeille-bord: #E5E7EB;         /* Bordures douces */
+    --abeille-blanc: #FFFFFF;
+    --abeille-bg: #FAFBFB;           /* Fond général très clair */
+
+    /* Alias anciens → nouveaux pour compatibilité */
+    --bleu: var(--abeille-noir);
+    --bleu2: var(--abeille-gris-fonce);
+    --bleu-clr: var(--abeille-jaune-clr);
+    --bleu-res: var(--abeille-jaune-clr);
+    --jaune: var(--abeille-jaune);
+    --jaune-fonce: var(--abeille-jaune-fonce);
+    --jaune-clr: var(--abeille-jaune-clr);
+    --gris-saisie: var(--abeille-gris-clr);
+    --vert: var(--abeille-vert);
+    --vert-clr: var(--abeille-vert-clr);
+    --orange: var(--abeille-orange);
+    --orange-clr: var(--abeille-orange-clr);
+    --rouge: var(--abeille-corail);
+    --rouge-clr: var(--abeille-corail-clr);
+    --gris-bg: var(--abeille-bg);
+    --gris-bord: var(--abeille-bord);
+    --texte: var(--abeille-noir);
+    --texte-leger: var(--abeille-gris);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Barlow', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--texte);
+    background: var(--gris-bg);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.01em;
+  }
+  body { padding-bottom: 20px; min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: #FFFFFF;
+    color: var(--abeille-noir);
+    padding: 10px 14px 12px;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    border-bottom: 1px solid var(--abeille-bord);
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 6px 0 2px;
+  }
+  .header-logo {
+    flex-shrink: 0;
+    width: 180px;
+    height: auto;
+    max-height: 64px;
+  }
+  .header-brand-text,
+  .header-brand-title,
+  .header-brand-baseline,
+  .header-app-name { display: none; }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .header-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--abeille-jaune);
+    color: var(--abeille-noir);
+    border: none;
+    border-radius: 22px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .header-btn:active, .header-btn:hover {
+    background: var(--abeille-jaune-fonce);
+    transform: translateY(1px);
+  }
+  .header-btn .ico {
+    font-size: 14px;
+  }
+  .header-btn .lbl {
+    font-size: 12px;
+    font-weight: 700;
+  }
+  @media (max-width: 380px) {
+    .header-btn .lbl { display: none; }
+    .header-btn { padding: 9px 13px; }
+    .header-logo { width: 150px; }
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 10px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+    border-radius: 10px;
+    z-index: 250;
+    min-width: 240px;
+    padding: 6px;
+    border: 1px solid var(--gris-bord);
+  }
+  .dropdown-menu.hidden { display: none; }
+  .dropdown-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    background: transparent;
+    border: none;
+    color: var(--texte);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: inherit;
+  }
+  .dropdown-menu button:active,
+  .dropdown-menu button:hover {
+    background: var(--gris-saisie);
+  }
+
+  /* TABS */
+  nav.tabs {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid var(--gris-bord);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav.tabs::-webkit-scrollbar { display: none; }
+  nav.tabs button {
+    flex: 1 0 auto;
+    min-width: max-content;
+    background: transparent;
+    border: none;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--abeille-gris);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    font-family: inherit;
+    border-radius: 0;
+    letter-spacing: 0.02em;
+  }
+  nav.tabs button:hover { color: var(--abeille-noir); }
+  nav.tabs button.active {
+    color: var(--abeille-noir);
+    border-bottom-color: var(--abeille-jaune);
+    background: var(--abeille-jaune-clr);
+  }
+
+  /* PAGES */
+  .page {
+    display: none;
+    padding: 14px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .page.active { display: block; }
+
+  /* SECTIONS */
+  .section {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    border: 1px solid var(--abeille-bord);
+  }
+  .section-header {
+    background: #fff;
+    color: var(--abeille-noir);
+    padding: 12px 14px 10px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--abeille-bord);
+    border-left: 4px solid var(--abeille-jaune);
+  }
+  .section-body { padding: 14px; }
+
+  /* FORM FIELDS */
+  .field {
+    margin-bottom: 12px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bleu);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1.5px solid var(--gris-bord);
+    border-radius: 8px;
+    background: var(--gris-saisie);
+    font-size: 16px; /* ≥16px évite le zoom iOS */
+    font-family: inherit;
+    color: var(--texte);
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--bleu2);
+    background: #fff;
+  }
+  .field input[readonly], .field .result {
+    background: var(--bleu-res);
+    color: var(--bleu);
+    font-weight: 700;
+    border-color: var(--bleu-res);
+  }
+  .field textarea {
+    min-height: 70px;
+    resize: vertical;
+  }
+  .field .unit {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--texte-leger);
+    margin-left: 4px;
+  }
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* CHECKBOXES */
+  .chk-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chk-group label.chk {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #fff;
+    border: 2px solid var(--gris-bord);
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .chk-group label.chk input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+  }
+  .chk-group label.chk::before {
+    content: "";
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--gris-bord);
+    transition: all 0.15s;
+    flex-shrink: 0;
+    text-align: center;
+    line-height: 18px;
+    color: transparent;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .chk-group label.chk.checked,
+  .chk-group label.chk:has(input:checked) {
+    background: var(--vert-clr);
+    border-color: var(--vert);
+    color: var(--vert);
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(27,94,32,0.15);
+  }
+  .chk-group label.chk.checked::before,
+  .chk-group label.chk:has(input:checked)::before {
+    content: "✓";
+    background: var(--vert);
+    border-color: var(--vert);
+    color: #fff;
+  }
+
+  /* AUTOCOMPLETE */
+  .ac-wrap { position: relative; }
+  .ac-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1.5px solid var(--bleu2);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 50;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .ac-list.hidden { display: none; }
+  .ac-item {
+    padding: 10px 12px;
+    font-size: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--gris-bord);
+  }
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:active, .ac-item:hover {
+    background: var(--bleu-clr);
+  }
+  .ac-item .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .ac-item .tag.r { background: var(--rouge-clr); color: var(--rouge); }
+  .ac-item .tag.b { background: var(--jaune-clr); color: #8B6914; }
+
+  /* RESULT HIGHLIGHT */
+  .result-box {
+    background: var(--abeille-jaune);
+    color: var(--abeille-noir);
+    padding: 18px;
+    border-radius: 14px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin: 8px 0;
+    border: none;
+    box-shadow: 0 2px 10px rgba(254,209,0,0.35);
+  }
+  .result-box .label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+
+  /* BADGES */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 2px 0;
+  }
+  .badge-ok { background: var(--vert-clr); color: var(--vert); }
+  .badge-warn { background: var(--orange-clr); color: var(--orange); }
+  .badge-err { background: var(--rouge-clr); color: var(--rouge); }
+  .badge-info { background: var(--bleu-clr); color: var(--bleu); }
+
+  /* BUTTONS */
+  button, .btn {
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 24px;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary {
+    background: var(--abeille-jaune);
+    color: var(--abeille-noir);
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(254,209,0,0.25);
+  }
+  .btn-primary:active, .btn-primary:hover {
+    background: var(--abeille-jaune-fonce);
+    transform: translateY(1px);
+  }
+  .btn-secondary {
+    background: #fff;
+    color: var(--abeille-noir);
+    border: 1.5px solid var(--abeille-noir);
+  }
+  .btn-secondary:active, .btn-secondary:hover {
+    background: var(--abeille-noir);
+    color: #fff;
+  }
+  .btn-danger {
+    background: #fff;
+    color: var(--abeille-corail);
+    border: 1.5px solid var(--abeille-corail);
+  }
+  .btn-danger:active, .btn-danger:hover {
+    background: var(--abeille-corail);
+    color: #fff;
+  }
+  .btn-small {
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 20px;
+  }
+  .btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .btn-group .btn, .btn-group button { flex: 1; }
+
+  /* PARCELLES */
+  .parcelle-card {
+    background: #fff;
+    border: 1.5px solid var(--gris-bord);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .parcelle-header {
+    background: var(--abeille-jaune-clr);
+    color: var(--abeille-noir);
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    border-left: 4px solid var(--abeille-jaune);
+  }
+  .parcelle-header .title {
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .parcelle-header .meta {
+    font-size: 11px;
+    color: var(--abeille-gris);
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .parcelle-header .chevron {
+    font-size: 18px;
+    transition: transform 0.2s;
+  }
+  .parcelle-card.open .chevron { transform: rotate(180deg); }
+  .parcelle-body {
+    display: none;
+    padding: 12px;
+  }
+  .parcelle-card.open .parcelle-body { display: block; }
+  .parcelle-summary {
+    padding: 10px 14px;
+    background: #FAFBFD;
+    border-top: 1px solid var(--gris-bord);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .parcelle-summary.empty {
+    color: var(--texte-leger);
+    font-style: italic;
+  }
+  .add-parcelle-btn {
+    width: 100%;
+    padding: 14px;
+    background: #fff;
+    border: 2px dashed var(--bleu2);
+    border-radius: 10px;
+    color: var(--bleu);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .add-parcelle-btn:active { background: var(--bleu-clr); }
+
+  /* TABLES RECAP */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table th, table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gris-bord);
+    text-align: left;
+  }
+  table th {
+    background: var(--bleu);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  table th.num, table td.num {
+    text-align: right;
+    white-space: nowrap;
+  }
+  table tr:nth-child(even) td { background: #FAFBFD; }
+  table tfoot td {
+    background: var(--bleu) !important;
+    color: #fff;
+    font-weight: 700;
+    border: none;
+  }
+
+  /* SEARCH / PLAFONDS */
+  .search-box {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 1.5px solid var(--gris-bord);
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+  }
+  .search-box::before {
+    content: "🔍";
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+  }
+  .plafond-item {
+    background: #fff;
+    border: 1.5px solid var(--gris-bord);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .plafond-item.actif {
+    background: var(--vert-clr);
+    border-color: var(--vert);
+  }
+  .plafond-item .info {
+    flex: 1;
+    min-width: 0;
+  }
+  .plafond-item .name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bleu);
+  }
+  .plafond-item .meta {
+    font-size: 11px;
+    color: var(--texte-leger);
+    margin-top: 2px;
+  }
+  .plafond-item .badge-cat {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--bleu);
+    color: #fff;
+    margin-right: 4px;
+  }
+  .plafond-item .badge-cat.igp { background: var(--orange); }
+  .plafond-item .badge-cat.vdp { background: #6B7280; }
+  .plafond-item .yields {
+    font-size: 11px;
+    color: var(--bleu);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .plafond-item .toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--gris-bord);
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 700;
+    color: transparent;
+    flex-shrink: 0;
+  }
+  .plafond-item.actif .toggle {
+    background: var(--vert);
+    border-color: var(--vert);
+    color: #fff;
+  }
+  .plafond-item.actif .toggle::before { content: "✓"; font-size: 16px; }
+
+  /* ABAQUE */
+  .abaque-section { margin-bottom: 16px; }
+  .abaque-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .abaque-card {
+    background: #fff;
+    border: 1px solid var(--gris-bord);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+  }
+  .abaque-card.rouge { border-left: 3px solid var(--rouge); }
+  .abaque-card.blanc { border-left: 3px solid var(--jaune); }
+  .abaque-card .name { font-weight: 700; color: var(--bleu); font-size: 13px; }
+  .abaque-card .values { margin-top: 4px; color: var(--texte-leger); }
+  .abaque-card .main { color: var(--texte); font-weight: 700; }
+
+  /* GUIDE STEP */
+  .guide-step {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: var(--gris-saisie);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  .guide-step .num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: var(--bleu);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .guide-step .content {
+    flex: 1;
+  }
+  .guide-step .title {
+    font-weight: 700;
+    color: var(--bleu);
+    font-size: 14px;
+  }
+  .guide-step .desc {
+    font-size: 13px;
+    color: var(--texte-leger);
+    margin-top: 2px;
+  }
+
+  /* NOTE */
+  .note {
+    background: var(--jaune-clr);
+    border-left: 4px solid var(--jaune);
+    padding: 10px 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+  }
+  .note.alert {
+    background: var(--orange-clr);
+    border-left-color: var(--orange);
+    color: var(--orange);
+    font-weight: 600;
+  }
+  .note.error {
+    background: var(--rouge-clr);
+    border-left-color: var(--rouge);
+    color: var(--rouge);
+    font-weight: 600;
+  }
+
+  /* BOTTOM BAR */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid var(--gris-bord);
+    padding: 10px 10px;
+    display: flex;
+    gap: 6px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,.06);
+    z-index: 50;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  .bottom-bar .btn { flex: 1; padding: 11px 8px; font-size: 13px; }
+  .bottom-bar .btn-small { flex: 0 0 auto; padding: 11px 14px; font-size: 16px; }
+
+  /* MODAL */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  .modal h3 {
+    margin: 0 0 12px 0;
+    color: var(--bleu);
+    font-size: 16px;
+  }
+
+  /* PRINT */
+  @media print {
+    header, nav.tabs, .bottom-bar, .parcelle-header .chevron,
+    .add-parcelle-btn, button { display: none !important; }
+    body { padding-bottom: 0; background: #fff; }
+    .page { display: block !important; page-break-after: always; }
+    .parcelle-card.open .parcelle-body { display: block !important; }
+    .section { box-shadow: none; border: 1px solid #ccc; }
+  }
+
+  /* UTILITY */
+  .hidden { display: none !important; }
+  .text-muted { color: var(--texte-leger); font-size: 12px; }
+  .text-center { text-align: center; }
+  .mt-10 { margin-top: 10px; }
+  .mb-10 { margin-bottom: 10px; }
+  .req { color: var(--rouge); font-weight: 700; margin-left: 3px; }
+  .hint-abaque {
+    font-size: 11px;
+    color: var(--texte-leger);
+    background: var(--bleu-clr);
+    border-left: 3px solid var(--bleu2);
+    padding: 6px 10px;
+    border-radius: 0 4px 4px 0;
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .hint-abaque strong {
+    color: var(--bleu);
+    font-style: normal;
+  }
+  .warning-bold {
+    color: var(--rouge);
+    font-weight: 700;
+    font-size: 14px;
+    background: var(--rouge-clr);
+    border: 2px solid var(--rouge);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 12px 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-actions">
+    <button class="header-btn" onclick="app.toggleNewMenu(event)" title="Nouvelle saisie / Importer" aria-label="Nouvelle saisie" data-new-toggle>
+      <span class="ico">➕</span>
+      <span class="lbl">Nouvelle saisie</span>
+    </button>
+    <button class="header-btn" onclick="app.toggleExportMenu(event)" title="Partager / Exporter" aria-label="Partager" data-export-toggle>
+      <span class="ico">📤</span>
+      <span class="lbl">Partager</span>
+    </button>
+  </div>
+
+  <div class="header-brand">
+    <svg class="header-logo" viewBox="0 0 260 100" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Abeille Assurances">
+      <!-- Petite abeille stylisée en haut à droite au-dessus du "e" final -->
+      <g transform="translate(195 10)">
+        <!-- Ailes jaunes translucides -->
+        <ellipse cx="-5" cy="2" rx="8" ry="5" fill="#FED100" fill-opacity="0.55" transform="rotate(-20 -5 2)"/>
+        <ellipse cx="8" cy="2" rx="8" ry="5" fill="#FED100" fill-opacity="0.75" transform="rotate(20 8 2)"/>
+        <!-- Corps de l'abeille -->
+        <ellipse cx="2" cy="9" rx="10" ry="6" fill="#1A1A1A"/>
+        <!-- Rayures jaunes -->
+        <rect x="-5" y="5.5" width="3" height="7" fill="#FED100"/>
+        <rect x="1" y="5.5" width="3" height="7" fill="#FED100"/>
+        <rect x="7" y="5.5" width="3" height="7" fill="#FED100"/>
+        <!-- Petit dard -->
+        <path d="M 12 9 L 15 7 L 15 11 Z" fill="#1A1A1A"/>
+      </g>
+
+      <!-- "abeille" en minuscules, bold, style rond -->
+      <text x="10" y="62"
+            font-family="'Barlow', -apple-system, sans-serif"
+            font-weight="800"
+            font-size="52"
+            fill="#1A1A1A"
+            letter-spacing="-1">abeille</text>
+
+      <!-- "ASSURANCES" en capitales espacées -->
+      <text x="12" y="88"
+            font-family="'Barlow', -apple-system, sans-serif"
+            font-weight="500"
+            font-size="14"
+            fill="#1A1A1A"
+            letter-spacing="5">ASSURANCES</text>
+    </svg>
+  </div>
+
+  <div class="dropdown-menu hidden" id="new-menu">
+    <button onclick="app.nouveauDossier(); app.closeNewMenu();">➕ Nouvelle saisie (vide)</button>
+    <button onclick="app.importerJSON(); app.closeNewMenu();">📥 Reprendre un dossier (JSON)</button>
+  </div>
+
+  <div class="dropdown-menu hidden" id="export-menu" style="left:auto; right:10px;">
+    <button onclick="app.exporterPDF(); app.closeExportMenu();">📄 Exporter en PDF</button>
+    <button onclick="app.exporterExcel(); app.closeExportMenu();">📊 Exporter en Excel</button>
+    <button onclick="app.exporterJSON(); app.closeExportMenu();">💾 Sauvegarder (JSON)</button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button class="active" data-tab="saisie">Saisie</button>
+  <button data-tab="recap">Synthèse</button>
+  <button data-tab="plafonds">Appellations</button>
+  <button data-tab="abaque">Abaque</button>
+  <button data-tab="guide">Guide</button>
+</nav>
+
+<!-- =============== SAISIE =============== -->
+<div class="page active" id="page-saisie">
+
+  <div class="section">
+    <div class="section-header">1. Informations globales du dossier</div>
+    <div class="section-body" id="dossier-fields">
+      <div class="row-2">
+        <div class="field"><label>N° contrat <span class="req">*</span></label><input type="text" data-field="contrat"></div>
+        <div class="field"><label>N° sinistre <span class="req">*</span></label><input type="text" data-field="sinistre_num"></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label>N° expertise</label><input type="text" data-field="expertise"></div>
+        <div class="field"><label>Assuré <span class="req">*</span></label><input type="text" data-field="assure"></div>
+      </div>
+      <div class="field"><label>Adresse exploitation</label><input type="text" data-field="adresse"></div>
+      <div class="row-2">
+        <div class="field"><label>Commune</label><input type="text" data-field="commune"></div>
+        <div class="field"><label>Département</label><input type="text" data-field="departement"></div>
+      </div>
+      <div class="field">
+        <label>Type de sinistre <span class="req">*</span></label>
+        <select data-field="sinistre">
+          <option value=""></option>
+          <option>Gel précoce</option>
+          <option>Gel tardif</option>
+          <option>Sécheresse</option>
+          <option>Coup de chaleur</option>
+          <option>Sécheresse + coup de chaleur</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="row-2">
+        <div class="field"><label>Expert(s) <span class="req">*</span></label><input type="text" data-field="expert"></div>
+        <div class="field"><label>Date visite <span class="req">*</span></label><input type="date" data-field="date_visite"></div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Niveau complexité</label>
+          <select data-field="niveau">
+            <option value=""></option>
+            <option>Niveau 1 - Simple</option>
+            <option>Niveau 2 - Moyen</option>
+            <option>Niveau 3 - Complexe</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Surface totale assurée</label>
+          <input type="number" step="0.01" data-field="surface_totale" placeholder="ha">
+        </div>
+      </div>
+      <div class="field">
+        <label>Présence lors de la visite</label>
+        <div class="chk-group">
+          <label class="chk"><input type="checkbox" data-field="presence_agent"> Agent</label>
+          <label class="chk"><input type="checkbox" data-field="presence_inspecteur"> Inspecteur</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      2. Comptages parcelles
+      <span id="nb-parcelles-badge" style="background:var(--jaune); color:var(--bleu); padding:2px 10px; border-radius:20px; font-size:11px;">0</span>
+    </div>
+    <div class="section-body">
+      <div class="note">Ajouter autant de parcelles que nécessaire. Tapotez sur une parcelle pour l'ouvrir/refermer.</div>
+      <div id="parcelles-container"></div>
+      <button class="add-parcelle-btn" id="btn-add-parcelle">+ Ajouter une parcelle</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- =============== RECAP =============== -->
+<div class="page" id="page-recap">
+
+  <div class="section">
+    <div class="section-header">Synthèse dossier</div>
+    <div class="section-body" id="recap-dossier"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Détail par parcelle</div>
+    <div class="section-body">
+      <div class="table-wrap" id="recap-detail"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Synthèse par appellation</div>
+    <div class="section-body">
+      <div class="note">Agrégation automatique des parcelles ayant la même appellation.</div>
+      <div class="table-wrap" id="recap-appellation"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- =============== PLAFONDS =============== -->
+<div class="page" id="page-plafonds">
+  <div class="section">
+    <div class="section-header">Base Appellations (AOP / IGP / Vin de Pays)</div>
+    <div class="section-body">
+      <div class="search-box">
+        <input type="search" id="plafond-search" placeholder="Rechercher une appellation...">
+      </div>
+      <div class="btn-group mb-10">
+        <button class="btn btn-secondary btn-small" id="filter-all">Toutes</button>
+        <button class="btn btn-secondary btn-small" id="filter-aop">AOP</button>
+        <button class="btn btn-secondary btn-small" id="filter-igp">IGP</button>
+        <button class="btn btn-secondary btn-small" id="filter-vdp">Vin de Pays / VSIG</button>
+        <button class="btn btn-secondary btn-small" id="filter-actives">Actives</button>
+      </div>
+      <div class="note">
+        Cochez les appellations à faire apparaître dans le menu de Saisie.
+        <br><strong id="nb-actives">0</strong> appellation(s) active(s) sur <strong id="nb-total">0</strong>.
+      </div>
+      <div class="btn-group mb-10">
+        <button class="btn btn-secondary btn-small" id="btn-add-appel">+ Ajouter appellation</button>
+        <button class="btn btn-secondary btn-small" id="btn-reset-actives">Tout décocher</button>
+      </div>
+      <div id="plafonds-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== ABAQUE =============== -->
+<div class="page" id="page-abaque">
+  <div class="section">
+    <div class="section-header">1. Poids moyen grappe à maturité (g)</div>
+    <div class="section-body">
+      <div class="note">Valeurs indicatives à ajuster au contexte millésime et situation pédoclimatique.</div>
+      <h4 style="color:var(--rouge); margin:10px 0 6px 0; font-size:13px;">Cépages rouges</h4>
+      <div class="abaque-grid" id="cepages-rouges"></div>
+      <h4 style="color:#B8860B; margin:16px 0 6px 0; font-size:13px;">Cépages blancs</h4>
+      <div class="abaque-grid" id="cepages-blancs"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">2. Rendement jus (kg de raisin / hl de vin)</div>
+    <div class="section-body">
+      <div id="jus-list"></div>
+      <div class="note mt-10">ℹ Plus la valeur est élevée, moins le jus est extrait par kg de raisin.</div>
+    </div>
+  </div>
+</div>
+
+<!-- =============== GUIDE =============== -->
+<div class="page" id="page-guide">
+
+  <div class="section">
+    <div class="section-header">Comment utiliser l'outil</div>
+    <div class="section-body">
+      <div class="guide-step">
+        <div class="num">1</div>
+        <div class="content">
+          <div class="title">Sélectionner vos appellations</div>
+          <div class="desc">Onglet Appellations : cochez les appellations utiles pour ce dossier. Elles apparaîtront dans les menus déroulants des parcelles.</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="num">2</div>
+        <div class="content">
+          <div class="title">Remplir l'en-tête dossier</div>
+          <div class="desc">Onglet Saisie, section Informations globales : contrat, assuré, commune, type de sinistre, expert…</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="num">3</div>
+        <div class="content">
+          <div class="title">Ajouter les parcelles expertisées</div>
+          <div class="desc">Section Comptages parcelles : bouton "+ Ajouter une parcelle" autant de fois que nécessaire. Un bloc par parcelle visitée.</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="num">4</div>
+        <div class="content">
+          <div class="title">Consulter la synthèse</div>
+          <div class="desc">Onglet Synthèse : détail par parcelle, total dossier, synthèse par appellation (surface cumulée, rendement moyen pondéré, production).</div>
+        </div>
+      </div>
+      <div class="guide-step">
+        <div class="num">5</div>
+        <div class="content">
+          <div class="title">Exporter / Sauvegarder</div>
+          <div class="desc">Bouton Exporter PDF en bas pour le rapport. Excel pour remontée dans les systèmes. JSON pour sauvegarde et reprise.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">💾 Comprendre les 3 formats d'export</div>
+    <div class="section-body">
+      <div class="note" style="margin-bottom:12px;">
+        Les données saisies sont enregistrées automatiquement dans votre navigateur. Pour les partager ou les mettre à l'abri, utilisez les formats ci-dessous via le bouton 📤 en haut à gauche.
+      </div>
+
+      <div style="display:flex; gap:10px; padding:12px; background:#FFF; border:2px solid var(--rouge); border-radius:10px; margin-bottom:10px;">
+        <div style="font-size:32px;">📄</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; color:var(--rouge); margin-bottom:4px;">PDF — Rapport</div>
+          <div style="font-size:13px; color:var(--texte-leger);">Document figé prêt à imprimer, archiver ou transmettre à l'assuré / à la compagnie. Non modifiable.</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; padding:12px; background:#FFF; border:2px solid var(--vert); border-radius:10px; margin-bottom:10px;">
+        <div style="font-size:32px;">📊</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; color:var(--vert); margin-bottom:4px;">Excel — Remontée données</div>
+          <div style="font-size:13px; color:var(--texte-leger);">3 feuilles (Dossier, Parcelles, Synthèse). Utile pour remontée dans les systèmes Abeille ou analyses personnelles.</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; padding:12px; background:#FFF; border:2px solid var(--bleu); border-radius:10px; margin-bottom:10px;">
+        <div style="font-size:32px;">💾</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; color:var(--bleu); margin-bottom:4px;">JSON — Sauvegarde de travail</div>
+          <div style="font-size:13px; color:var(--texte-leger); margin-bottom:6px;">
+            Seul format qui permet de <strong>reprendre un dossier là où vous l'avez laissé</strong>, sur un autre appareil ou plus tard. Indispensable avant "Nouvelle saisie" si vous voulez pouvoir revenir au dossier.
+          </div>
+          <div style="font-size:12px; background:var(--jaune-clr); padding:8px; border-radius:6px; border-left:3px solid var(--jaune);">
+            <strong>Cas d'usage typiques :</strong><br>
+            • Sauvegarder avant de changer de dossier (sécurité)<br>
+            • Commencer sur tablette terrain, finir sur PC au bureau<br>
+            • Transférer un dossier à un collègue expert
+          </div>
+        </div>
+      </div>
+
+      <div class="note" style="margin-top:10px;">
+        <strong>Bon réflexe :</strong> s'envoyer chaque JSON par mail et se créer un dossier dédié "Sauvegardes estimation viticole". En cas de problème (perte du téléphone, navigateur effacé), vous récupérez tous vos dossiers en quelques secondes.
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Nommage automatique des fichiers</div>
+    <div class="section-body">
+      <div class="note">
+        Les fichiers exportés sont nommés automatiquement selon le format :<br>
+        <strong>AssuréNom-NuméroSinistre_DateHeure.extension</strong><br><br>
+        Exemple : <em>Domaine-Exemple-S2026-1234_20260815_1430.pdf</em><br><br>
+        Si l'Assuré ou le N° sinistre n'est pas renseigné, le nommage utilise ce qui est disponible (contrat, date).
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Outils nécessaires terrain</div>
+    <div class="section-body">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="badge badge-ok">✓ Mètre ruban</span>
+        <span class="badge badge-ok">✓ Peson</span>
+        <span class="badge badge-ok">✓ Seau</span>
+        <span class="badge badge-ok">✓ Sécateur</span>
+        <span class="badge badge-ok">✓ Tablette / smartphone</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL WARNING NOUVELLE SAISIE -->
+<div class="modal-bg" id="modal-nouvelle-saisie">
+  <div class="modal">
+    <h3 style="color:var(--rouge);">⚠ Nouvelle saisie</h3>
+    <div class="warning-bold">
+      ATTENTION : les données actuelles seront DÉFINITIVEMENT PERDUES si vous n'avez pas exporté le dossier (PDF, Excel ou JSON).
+    </div>
+    <p style="margin:12px 0; font-size:13px;">Voulez-vous vraiment démarrer une nouvelle saisie et effacer les données en cours ?</p>
+    <div class="note" style="margin:12px 0;">
+      💡 <strong>Conseil :</strong> sauvegardez d'abord en JSON si vous voulez pouvoir reprendre ce dossier plus tard.
+    </div>
+    <div class="btn-group mt-10" style="flex-direction:column; gap:8px;">
+      <button class="btn btn-primary" onclick="app.sauvegarderPuisNouveau()" style="background:var(--vert); border-color:var(--vert);">💾 Sauvegarder JSON puis démarrer</button>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="document.getElementById('modal-nouvelle-saisie').classList.remove('open')">Annuler</button>
+        <button class="btn btn-danger" onclick="app.confirmerNouveauDossier()">Démarrer sans sauvegarder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AJOUT APPELLATION -->
+<div class="modal-bg" id="modal-appel">
+  <div class="modal">
+    <h3>Ajouter une appellation</h3>
+    <div class="field"><label>Nom</label><input type="text" id="na-nom"></div>
+    <div class="row-2">
+      <div class="field">
+        <label>Catégorie</label>
+        <select id="na-cat"><option>AOP</option><option>IGP</option><option>VDP</option><option>VSIG</option></select>
+      </div>
+      <div class="field"><label>Couleur(s)</label><input type="text" id="na-coul" placeholder="Rouge/Rosé/Blanc"></div>
+    </div>
+    <div class="row-2">
+      <div class="field"><label>Rdt base (hl/ha)</label><input type="number" id="na-base"></div>
+      <div class="field"><label>Rdt butoir (hl/ha)</label><input type="number" id="na-butoir"></div>
+    </div>
+    <div class="field"><label>Région</label><input type="text" id="na-region"></div>
+    <div class="btn-group mt-10">
+      <button class="btn btn-secondary" onclick="document.getElementById('modal-appel').classList.remove('open')">Annuler</button>
+      <button class="btn btn-primary" onclick="app.ajouterAppellation()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Librairies CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// BASE DE DONNÉES DES APPELLATIONS
+// ═══════════════════════════════════════════════════════════
+const APPELLATIONS_DEFAULT = [
+  // Alsace
+  ["Alsace","AOP","Blanc/Rouge",80,90,"Alsace"],
+  ["Alsace Grand Cru","AOP","Blanc",55,66,"Alsace"],
+  ["Crémant d'Alsace","AOP","Blanc/Rosé",80,85,"Alsace"],
+  // Beaujolais
+  ["Beaujolais","AOP","Rouge/Rosé/Blanc",60,70,"Beaujolais"],
+  ["Beaujolais Villages","AOP","Rouge/Rosé/Blanc",58,65,"Beaujolais"],
+  ["Brouilly","AOP","Rouge",56,64,"Beaujolais"],
+  ["Chénas","AOP","Rouge",52,58,"Beaujolais"],
+  ["Chiroubles","AOP","Rouge",52,58,"Beaujolais"],
+  ["Côte de Brouilly","AOP","Rouge",52,58,"Beaujolais"],
+  ["Fleurie","AOP","Rouge",52,58,"Beaujolais"],
+  ["Juliénas","AOP","Rouge",52,58,"Beaujolais"],
+  ["Morgon","AOP","Rouge",52,58,"Beaujolais"],
+  ["Moulin-à-Vent","AOP","Rouge",52,58,"Beaujolais"],
+  ["Régnié","AOP","Rouge",56,64,"Beaujolais"],
+  ["Saint-Amour","AOP","Rouge",52,58,"Beaujolais"],
+  // Bordeaux
+  ["Bordeaux","AOP","Rouge/Rosé/Blanc",60,65,"Bordeaux"],
+  ["Bordeaux Supérieur","AOP","Rouge/Blanc",53,60,"Bordeaux"],
+  ["Médoc","AOP","Rouge",57,63,"Bordeaux"],
+  ["Haut-Médoc","AOP","Rouge",55,61,"Bordeaux"],
+  ["Margaux","AOP","Rouge",57,63,"Bordeaux"],
+  ["Pauillac","AOP","Rouge",57,63,"Bordeaux"],
+  ["Saint-Estèphe","AOP","Rouge",57,63,"Bordeaux"],
+  ["Saint-Julien","AOP","Rouge",57,63,"Bordeaux"],
+  ["Pessac-Léognan","AOP","Rouge/Blanc",55,63,"Bordeaux"],
+  ["Graves","AOP","Rouge/Blanc",55,65,"Bordeaux"],
+  ["Sauternes","AOP","Blanc liquoreux",25,40,"Bordeaux"],
+  ["Barsac","AOP","Blanc liquoreux",25,40,"Bordeaux"],
+  ["Saint-Émilion","AOP","Rouge",53,60,"Bordeaux"],
+  ["Saint-Émilion Grand Cru","AOP","Rouge",46,53,"Bordeaux"],
+  ["Pomerol","AOP","Rouge",49,55,"Bordeaux"],
+  ["Fronsac","AOP","Rouge",52,58,"Bordeaux"],
+  ["Côtes de Bordeaux","AOP","Rouge/Blanc",55,63,"Bordeaux"],
+  ["Entre-Deux-Mers","AOP","Blanc",65,72,"Bordeaux"],
+  // Bourgogne
+  ["Bourgogne","AOP","Rouge/Blanc/Rosé",55,69,"Bourgogne"],
+  ["Bourgogne Aligoté","AOP","Blanc",60,75,"Bourgogne"],
+  ["Chablis","AOP","Blanc",60,72,"Bourgogne"],
+  ["Chablis Premier Cru","AOP","Blanc",58,67,"Bourgogne"],
+  ["Chablis Grand Cru","AOP","Blanc",54,64,"Bourgogne"],
+  ["Petit Chablis","AOP","Blanc",60,72,"Bourgogne"],
+  ["Marsannay","AOP","Rouge/Blanc/Rosé",50,58,"Bourgogne"],
+  ["Gevrey-Chambertin","AOP","Rouge",40,48,"Bourgogne"],
+  ["Chambolle-Musigny","AOP","Rouge",40,48,"Bourgogne"],
+  ["Vosne-Romanée","AOP","Rouge",40,48,"Bourgogne"],
+  ["Nuits-Saint-Georges","AOP","Rouge/Blanc",40,48,"Bourgogne"],
+  ["Beaune","AOP","Rouge/Blanc",45,57,"Bourgogne"],
+  ["Pommard","AOP","Rouge",40,48,"Bourgogne"],
+  ["Volnay","AOP","Rouge",40,48,"Bourgogne"],
+  ["Meursault","AOP","Blanc/Rouge",45,57,"Bourgogne"],
+  ["Puligny-Montrachet","AOP","Blanc/Rouge",45,57,"Bourgogne"],
+  ["Chassagne-Montrachet","AOP","Blanc/Rouge",45,57,"Bourgogne"],
+  ["Mâcon","AOP","Rouge/Blanc/Rosé",60,72,"Bourgogne"],
+  ["Mâcon-Villages","AOP","Blanc",60,72,"Bourgogne"],
+  ["Pouilly-Fuissé","AOP","Blanc",55,64,"Bourgogne"],
+  ["Saint-Véran","AOP","Blanc",58,68,"Bourgogne"],
+  ["Mercurey","AOP","Rouge/Blanc",48,60,"Bourgogne"],
+  ["Rully","AOP","Rouge/Blanc",53,64,"Bourgogne"],
+  ["Givry","AOP","Rouge/Blanc",50,62,"Bourgogne"],
+  // Champagne
+  ["Champagne","AOP","Blanc/Rosé",66,66,"Champagne"],
+  // Jura / Savoie
+  ["Arbois","AOP","Rouge/Blanc/Rosé",55,65,"Jura"],
+  ["Château-Chalon","AOP","Blanc (Vin jaune)",30,35,"Jura"],
+  ["Côtes du Jura","AOP","Rouge/Blanc/Rosé",55,65,"Jura"],
+  ["Vin de Savoie","AOP","Blanc/Rouge/Rosé",65,75,"Savoie"],
+  ["Roussette de Savoie","AOP","Blanc",60,70,"Savoie"],
+  ["Bugey","AOP","Blanc/Rouge/Rosé",65,75,"Savoie"],
+  // Vallée du Rhône
+  ["Côtes du Rhône","AOP","Rouge/Rosé/Blanc",51,60,"Vallée du Rhône"],
+  ["Côtes du Rhône Villages","AOP","Rouge/Rosé/Blanc",44,50,"Vallée du Rhône"],
+  ["Châteauneuf-du-Pape","AOP","Rouge/Blanc",35,40,"Vallée du Rhône"],
+  ["Gigondas","AOP","Rouge/Rosé",36,42,"Vallée du Rhône"],
+  ["Vacqueyras","AOP","Rouge/Rosé/Blanc",36,42,"Vallée du Rhône"],
+  ["Lirac","AOP","Rouge/Rosé/Blanc",42,48,"Vallée du Rhône"],
+  ["Tavel","AOP","Rosé",42,46,"Vallée du Rhône"],
+  ["Beaumes-de-Venise","AOP","Rouge",38,44,"Vallée du Rhône"],
+  ["Rasteau","AOP","Rouge",36,42,"Vallée du Rhône"],
+  ["Cairanne","AOP","Rouge/Rosé/Blanc",38,44,"Vallée du Rhône"],
+  ["Vinsobres","AOP","Rouge",40,46,"Vallée du Rhône"],
+  ["Ventoux","AOP","Rouge/Rosé/Blanc",55,60,"Vallée du Rhône"],
+  ["Luberon","AOP","Rouge/Rosé/Blanc",55,60,"Vallée du Rhône"],
+  ["Costières de Nîmes","AOP","Rouge/Rosé/Blanc",60,66,"Vallée du Rhône"],
+  ["Duché d'Uzès","AOP","Rouge/Rosé/Blanc",55,60,"Vallée du Rhône"],
+  ["Grignan-les-Adhémar","AOP","Rouge/Rosé/Blanc",55,60,"Vallée du Rhône"],
+  ["Clairette de Die","AOP","Blanc effervescent",75,85,"Vallée du Rhône"],
+  ["Crémant de Die","AOP","Blanc effervescent",75,85,"Vallée du Rhône"],
+  ["Côte-Rôtie","AOP","Rouge",40,44,"Vallée du Rhône"],
+  ["Condrieu","AOP","Blanc",41,46,"Vallée du Rhône"],
+  ["Saint-Joseph","AOP","Rouge/Blanc",40,48,"Vallée du Rhône"],
+  ["Crozes-Hermitage","AOP","Rouge/Blanc",45,50,"Vallée du Rhône"],
+  ["Hermitage","AOP","Rouge/Blanc",40,44,"Vallée du Rhône"],
+  ["Cornas","AOP","Rouge",40,44,"Vallée du Rhône"],
+  ["Saint-Péray","AOP","Blanc",45,50,"Vallée du Rhône"],
+  // Provence
+  ["Côtes de Provence","AOP","Rosé/Rouge/Blanc",55,60,"Provence"],
+  ["Coteaux d'Aix-en-Provence","AOP","Rosé/Rouge/Blanc",60,65,"Provence"],
+  ["Coteaux Varois en Provence","AOP","Rosé/Rouge/Blanc",55,60,"Provence"],
+  ["Bandol","AOP","Rouge/Rosé/Blanc",40,45,"Provence"],
+  ["Cassis","AOP","Blanc/Rosé/Rouge",45,50,"Provence"],
+  ["Bellet","AOP","Rouge/Rosé/Blanc",40,45,"Provence"],
+  ["Palette","AOP","Rouge/Rosé/Blanc",40,45,"Provence"],
+  ["Les Baux-de-Provence","AOP","Rouge/Rosé/Blanc",50,55,"Provence"],
+  ["Pierrevert","AOP","Rouge/Rosé/Blanc",55,60,"Provence"],
+  // Languedoc / Roussillon
+  ["Languedoc","AOP","Rouge/Rosé/Blanc",50,55,"Languedoc"],
+  ["Pic Saint-Loup","AOP","Rouge/Rosé",45,50,"Languedoc"],
+  ["Terrasses du Larzac","AOP","Rouge",45,50,"Languedoc"],
+  ["La Clape","AOP","Rouge/Rosé/Blanc",45,50,"Languedoc"],
+  ["Picpoul de Pinet","AOP","Blanc",60,66,"Languedoc"],
+  ["Corbières","AOP","Rouge/Rosé/Blanc",50,55,"Languedoc"],
+  ["Corbières-Boutenac","AOP","Rouge",45,50,"Languedoc"],
+  ["Minervois","AOP","Rouge/Rosé/Blanc",50,55,"Languedoc"],
+  ["Minervois-La Livinière","AOP","Rouge",45,50,"Languedoc"],
+  ["Limoux","AOP","Blanc",50,56,"Languedoc"],
+  ["Crémant de Limoux","AOP","Blanc/Rosé",50,58,"Languedoc"],
+  ["Blanquette de Limoux","AOP","Blanc effervescent",50,58,"Languedoc"],
+  ["Fitou","AOP","Rouge",45,50,"Languedoc"],
+  ["Faugères","AOP","Rouge/Rosé/Blanc",45,50,"Languedoc"],
+  ["Saint-Chinian","AOP","Rouge/Rosé/Blanc",45,50,"Languedoc"],
+  ["Muscat de Frontignan","AOP","VDN",28,32,"Languedoc"],
+  ["Côtes du Roussillon","AOP","Rouge/Rosé/Blanc",50,55,"Roussillon"],
+  ["Côtes du Roussillon Villages","AOP","Rouge",45,50,"Roussillon"],
+  ["Collioure","AOP","Rouge/Rosé/Blanc",40,45,"Roussillon"],
+  ["Banyuls","AOP","VDN",30,35,"Roussillon"],
+  ["Maury","AOP","VDN/Rouge",30,35,"Roussillon"],
+  ["Rivesaltes","AOP","VDN",30,35,"Roussillon"],
+  ["Muscat de Rivesaltes","AOP","VDN",28,32,"Roussillon"],
+  // Sud-Ouest
+  ["Bergerac","AOP","Rouge/Rosé/Blanc",60,66,"Sud-Ouest"],
+  ["Monbazillac","AOP","Blanc liquoreux",27,30,"Sud-Ouest"],
+  ["Pécharmant","AOP","Rouge",50,55,"Sud-Ouest"],
+  ["Cahors","AOP","Rouge",50,55,"Sud-Ouest"],
+  ["Gaillac","AOP","Rouge/Rosé/Blanc",55,61,"Sud-Ouest"],
+  ["Fronton","AOP","Rouge/Rosé",55,60,"Sud-Ouest"],
+  ["Madiran","AOP","Rouge",55,60,"Sud-Ouest"],
+  ["Pacherenc du Vic-Bilh","AOP","Blanc",55,60,"Sud-Ouest"],
+  ["Jurançon","AOP","Blanc",60,65,"Sud-Ouest"],
+  ["Béarn","AOP","Rouge/Rosé/Blanc",60,65,"Sud-Ouest"],
+  ["Irouléguy","AOP","Rouge/Rosé/Blanc",55,60,"Sud-Ouest"],
+  ["Saint-Mont","AOP","Rouge/Rosé/Blanc",55,60,"Sud-Ouest"],
+  ["Côtes de Duras","AOP","Rouge/Rosé/Blanc",60,65,"Sud-Ouest"],
+  ["Buzet","AOP","Rouge/Rosé/Blanc",60,65,"Sud-Ouest"],
+  ["Côtes du Marmandais","AOP","Rouge/Rosé/Blanc",60,65,"Sud-Ouest"],
+  // Val de Loire
+  ["Muscadet","AOP","Blanc",65,70,"Val de Loire"],
+  ["Muscadet Sèvre et Maine","AOP","Blanc",60,65,"Val de Loire"],
+  ["Anjou","AOP","Rouge/Rosé/Blanc",60,66,"Val de Loire"],
+  ["Anjou-Villages","AOP","Rouge",50,55,"Val de Loire"],
+  ["Rosé d'Anjou","AOP","Rosé",60,66,"Val de Loire"],
+  ["Cabernet d'Anjou","AOP","Rosé",60,66,"Val de Loire"],
+  ["Coteaux du Layon","AOP","Blanc liquoreux",35,40,"Val de Loire"],
+  ["Savennières","AOP","Blanc",50,55,"Val de Loire"],
+  ["Saumur","AOP","Rouge/Blanc/Rosé",60,66,"Val de Loire"],
+  ["Saumur-Champigny","AOP","Rouge",55,60,"Val de Loire"],
+  ["Crémant de Loire","AOP","Blanc/Rosé",65,74,"Val de Loire"],
+  ["Touraine","AOP","Rouge/Rosé/Blanc",60,65,"Val de Loire"],
+  ["Chinon","AOP","Rouge/Blanc/Rosé",55,60,"Val de Loire"],
+  ["Bourgueil","AOP","Rouge/Rosé",55,60,"Val de Loire"],
+  ["Saint-Nicolas-de-Bourgueil","AOP","Rouge/Rosé",55,60,"Val de Loire"],
+  ["Vouvray","AOP","Blanc",52,58,"Val de Loire"],
+  ["Montlouis-sur-Loire","AOP","Blanc",52,58,"Val de Loire"],
+  ["Cheverny","AOP","Rouge/Rosé/Blanc",55,60,"Val de Loire"],
+  ["Sancerre","AOP","Blanc/Rouge/Rosé",60,65,"Val de Loire"],
+  ["Pouilly-Fumé","AOP","Blanc",60,65,"Val de Loire"],
+  ["Menetou-Salon","AOP","Blanc/Rouge/Rosé",60,65,"Val de Loire"],
+  ["Quincy","AOP","Blanc",60,65,"Val de Loire"],
+  ["Reuilly","AOP","Blanc/Rouge/Rosé",60,65,"Val de Loire"],
+  ["Haut-Poitou","AOP","Rouge/Rosé/Blanc",60,66,"Val de Loire"],
+  // Corse
+  ["Vin de Corse","AOP","Rouge/Rosé/Blanc",55,65,"Corse"],
+  ["Ajaccio","AOP","Rouge/Rosé/Blanc",50,55,"Corse"],
+  ["Patrimonio","AOP","Rouge/Rosé/Blanc",50,55,"Corse"],
+  // IGP
+  ["IGP Pays d'Oc","IGP","Tous",90,90,"Languedoc-Roussillon"],
+  ["IGP Méditerranée","IGP","Tous",90,90,"Sud-Est"],
+  ["IGP Atlantique","IGP","Tous",90,90,"Sud-Ouest"],
+  ["IGP Val de Loire","IGP","Tous",90,90,"Val de Loire"],
+  ["IGP Comté Tolosan","IGP","Tous",90,90,"Sud-Ouest"],
+  ["IGP Pays d'Hérault","IGP","Tous",90,90,"Languedoc"],
+  ["IGP Gard","IGP","Tous",90,90,"Languedoc"],
+  ["IGP Aude","IGP","Tous",90,90,"Languedoc"],
+  ["IGP Var","IGP","Tous",90,90,"Provence"],
+  ["IGP Bouches-du-Rhône","IGP","Tous",90,90,"Provence"],
+  ["IGP Vaucluse","IGP","Tous",90,90,"Vallée du Rhône"],
+  ["IGP Ardèche","IGP","Tous",90,90,"Vallée du Rhône"],
+  ["IGP Drôme","IGP","Tous",90,90,"Vallée du Rhône"],
+  ["IGP Alpes-Maritimes","IGP","Tous",90,90,"Provence"],
+  ["IGP Alpilles","IGP","Tous",90,90,"Provence"],
+  ["IGP Sable de Camargue","IGP","Tous",90,90,"Languedoc"],
+  ["IGP Pyrénées-Orientales","IGP","Tous",90,90,"Roussillon"],
+  ["IGP Côtes Catalanes","IGP","Tous",90,90,"Roussillon"],
+  ["IGP Cévennes","IGP","Tous",90,90,"Languedoc"],
+  ["IGP Périgord","IGP","Tous",90,90,"Sud-Ouest"],
+  ["IGP Landes","IGP","Tous",90,90,"Sud-Ouest"],
+  ["IGP Gers","IGP","Tous",90,90,"Sud-Ouest"],
+  ["IGP Côtes de Gascogne","IGP","Tous",90,90,"Sud-Ouest"],
+  ["IGP Lot","IGP","Tous",90,90,"Sud-Ouest"],
+  ["IGP Île de Beauté","IGP","Tous",90,90,"Corse"],
+  // VSIG (Vin Sans Indication Géographique)
+  ["Vin de France","VSIG","Tous",120,120,"National"],
+  ["Vin de France (monocépage)","VSIG","Tous",120,120,"National"],
+  // VDP (Vin de Pays — libellés génériques hors IGP reconnues)
+  ["Vin de Pays d'Oc","VDP","Tous",90,90,"Languedoc-Roussillon"],
+  ["Vin de Pays du Vaucluse","VDP","Tous",90,90,"Vallée du Rhône"],
+  ["Vin de Pays de l'Hérault","VDP","Tous",90,90,"Languedoc"],
+  ["Vin de Pays des Bouches-du-Rhône","VDP","Tous",90,90,"Provence"],
+  ["Vin de Pays de Vaucluse","VDP","Tous",90,90,"Vallée du Rhône"],
+  ["Vin de Pays du Var","VDP","Tous",90,90,"Provence"],
+  ["Vin de Pays du Gard","VDP","Tous",90,90,"Languedoc"],
+];
+
+const CEPAGES = [
+  ["Grenache N","Rouge",150,200,280],
+  ["Syrah","Rouge",120,160,220],
+  ["Mourvèdre","Rouge",130,170,230],
+  ["Cinsault","Rouge",180,240,320],
+  ["Carignan N","Rouge",170,220,290],
+  ["Cabernet-Sauvignon","Rouge",130,170,220],
+  ["Cabernet Franc","Rouge",140,180,230],
+  ["Merlot","Rouge",140,180,240],
+  ["Pinot Noir","Rouge",110,150,200],
+  ["Gamay","Rouge",150,200,270],
+  ["Malbec/Côt","Rouge",160,210,280],
+  ["Tannat","Rouge",150,200,260],
+  ["Grenache B","Blanc",130,180,240],
+  ["Vermentino/Rolle","Blanc",140,180,230],
+  ["Viognier","Blanc",130,170,220],
+  ["Clairette","Blanc",140,190,250],
+  ["Ugni Blanc","Blanc",160,210,280],
+  ["Chardonnay","Blanc",120,160,210],
+  ["Sauvignon","Blanc",110,150,200],
+  ["Chenin","Blanc",130,170,230],
+  ["Riesling","Blanc",100,140,180],
+  ["Gewurztraminer","Blanc",120,160,210],
+  ["Muscat","Blanc",130,180,240],
+];
+
+const JUS = [
+  ["Vin rouge standard","130 – 150"],
+  ["Vin rouge de garde / concentré","150 – 170"],
+  ["Vin rosé de pressurage direct","140 – 160"],
+  ["Vin rosé de saignée","130 – 150"],
+  ["Vin blanc sec","140 – 160"],
+  ["Vin blanc liquoreux / mutés","160 – 200"],
+];
+
+// ═══════════════════════════════════════════════════════════
+// APP
+// ═══════════════════════════════════════════════════════════
+const app = {
+  state: {
+    dossier: {},
+    parcelles: [],
+    appellations: null,
+    filtreAppel: 'all',
+  },
+
+  init() {
+    this.chargerEtat();
+    this.initOnglets();
+    this.initDossier();
+    this.initParcelles();
+    this.renderPlafonds();
+    this.initFiltres();
+    this.initRecherche();
+    this.renderAbaque();
+    this.initAjoutParcelle();
+    document.getElementById('btn-reset-actives').onclick = () => this.resetActives();
+    document.getElementById('btn-add-appel').onclick = () => this.ouvrirModalAppel();
+  },
+
+  chargerEtat() {
+    try {
+      const saved = localStorage.getItem('estim_viti_state');
+      if (saved) {
+        const s = JSON.parse(saved);
+        this.state.dossier = s.dossier || {};
+        this.state.parcelles = s.parcelles || [];
+        this.state.appellations = s.appellations || null;
+      }
+    } catch (e) { console.warn('Chargement échoué', e); }
+
+    if (!this.state.appellations) {
+      // Premier lancement : charger la base par défaut complète
+      this.state.appellations = APPELLATIONS_DEFAULT.map(a => ({
+        nom: a[0], cat: a[1], coul: a[2], base: a[3], butoir: a[4], region: a[5], actif: false
+      }));
+    } else {
+      // Fusion : ajouter les appellations par défaut manquantes (nouvelles entrées
+      // ajoutées dans les versions ultérieures du code). Préserve les actifs et
+      // les appellations ajoutées manuellement par l'utilisateur.
+      const existantsNoms = new Set(this.state.appellations.map(a => a.nom));
+      let nbAjoutes = 0;
+      APPELLATIONS_DEFAULT.forEach(a => {
+        if (!existantsNoms.has(a[0])) {
+          this.state.appellations.push({
+            nom: a[0], cat: a[1], coul: a[2], base: a[3], butoir: a[4], region: a[5], actif: false
+          });
+          nbAjoutes++;
+        }
+      });
+      if (nbAjoutes > 0) {
+        console.log(`${nbAjoutes} nouvelles appellations ajoutées à la base.`);
+        this.sauver();
+      }
+    }
+  },
+
+  sauver() {
+    try {
+      localStorage.setItem('estim_viti_state', JSON.stringify(this.state));
+    } catch (e) { console.warn('Sauvegarde échouée', e); }
+  },
+
+  initOnglets() {
+    document.querySelectorAll('nav.tabs button').forEach(b => {
+      b.onclick = () => {
+        document.querySelectorAll('nav.tabs button').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        document.getElementById('page-' + b.dataset.tab).classList.add('active');
+        if (b.dataset.tab === 'recap') this.renderRecap();
+        window.scrollTo(0, 0);
+      };
+    });
+  },
+
+  initDossier() {
+    document.querySelectorAll('#dossier-fields [data-field]').forEach(el => {
+      const key = el.dataset.field;
+      if (el.type === 'checkbox') {
+        el.checked = !!this.state.dossier[key];
+        // Synchroniser classe .checked sur le label parent pour compat universelle
+        const lbl = el.closest('label.chk');
+        if (lbl) lbl.classList.toggle('checked', el.checked);
+        el.addEventListener('change', () => {
+          this.state.dossier[key] = el.checked;
+          if (lbl) lbl.classList.toggle('checked', el.checked);
+          this.sauver();
+        });
+      } else {
+        if (this.state.dossier[key] !== undefined) el.value = this.state.dossier[key];
+        el.addEventListener('input', () => {
+          this.state.dossier[key] = el.value;
+          this.sauver();
+        });
+      }
+    });
+
+    // Autocomplete adresse → remplissage auto commune/département
+    this.bindAutocompleteAdresse();
+  },
+
+  bindAutocompleteAdresse() {
+    const adrInput = document.querySelector('[data-field="adresse"]');
+    if (!adrInput) return;
+
+    // Créer un container ac-list sous l'adresse
+    const wrap = adrInput.parentElement;
+    wrap.classList.add('ac-wrap');
+    const list = document.createElement('div');
+    list.className = 'ac-list hidden';
+    wrap.appendChild(list);
+
+    let timer = null;
+    let lastQuery = '';
+
+    const rechercher = async (q) => {
+      try {
+        const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&limit=6`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('API indisponible');
+        const data = await res.json();
+        return data.features || [];
+      } catch (e) {
+        return null; // Offline ou erreur
+      }
+    };
+
+    const afficher = (features) => {
+      if (!features || features.length === 0) {
+        list.classList.add('hidden');
+        return;
+      }
+      list.innerHTML = features.map(f => {
+        const p = f.properties;
+        return `<div class="ac-item" data-label="${this.esc(p.label)}" data-ville="${this.esc(p.city || '')}" data-cp="${this.esc(p.postcode || '')}" data-dept="${this.esc((p.context || '').split(',')[0].trim())}">
+          <strong>${this.esc(p.label)}</strong>
+        </div>`;
+      }).join('');
+      list.classList.remove('hidden');
+
+      list.querySelectorAll('.ac-item').forEach(item => {
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          const label = item.dataset.label;
+          const ville = item.dataset.ville;
+          const dept = item.dataset.dept;
+          adrInput.value = label;
+          this.state.dossier.adresse = label;
+
+          // Auto-remplissage commune / département
+          const communeInput = document.querySelector('[data-field="commune"]');
+          const deptInput = document.querySelector('[data-field="departement"]');
+          if (communeInput && ville) {
+            communeInput.value = ville;
+            this.state.dossier.commune = ville;
+          }
+          if (deptInput && dept) {
+            // dept récupéré est au format "26, Auvergne-Rhône-Alpes" ou juste "26"
+            deptInput.value = dept;
+            this.state.dossier.departement = dept;
+          }
+          this.sauver();
+          list.classList.add('hidden');
+        });
+      });
+    };
+
+    adrInput.addEventListener('input', () => {
+      const q = adrInput.value.trim();
+      if (q.length < 3) { list.classList.add('hidden'); return; }
+      if (q === lastQuery) return;
+      lastQuery = q;
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        const features = await rechercher(q);
+        afficher(features);
+      }, 350);
+    });
+
+    adrInput.addEventListener('blur', () => {
+      setTimeout(() => list.classList.add('hidden'), 250);
+    });
+  },
+
+  initAjoutParcelle() {
+    document.getElementById('btn-add-parcelle').onclick = () => {
+      this.state.parcelles.push(this.parcelleVide());
+      this.sauver();
+      this.renderParcelles();
+      // Scroll vers la nouvelle
+      setTimeout(() => {
+        const last = document.querySelector('#parcelles-container .parcelle-card:last-child');
+        if (last) {
+          last.classList.add('open');
+          last.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    };
+  },
+
+  parcelleVide() {
+    return {
+      nom: '', surface: '', age: '', cepage: '', couleur: '', appellation: '',
+      ecart_rangs: '', ecart_ceps: '', pct_vivants: 0.95,
+      nb_points_comptage: '', nb_ceps_comptes: '', nb_grappes: '', poids_grappe: '',
+      pct_pertes: 0, rdt_jus: 150
+    };
+  },
+
+  initParcelles() {
+    this.renderParcelles();
+  },
+
+  renderParcelles() {
+    const cont = document.getElementById('parcelles-container');
+    cont.innerHTML = '';
+    this.state.parcelles.forEach((p, i) => {
+      cont.appendChild(this.renderParcelleCard(p, i));
+    });
+    document.getElementById('nb-parcelles-badge').textContent = this.state.parcelles.length;
+  },
+
+  calcul(p) {
+    const toN = v => { const x = parseFloat(v); return isNaN(x) ? null : x; };
+    const er = toN(p.ecart_rangs), ec = toN(p.ecart_ceps);
+    const ceps_theo = (er && ec) ? 10000 / (er * ec) : null;
+    const pct_v = toN(p.pct_vivants);
+    const ceps_reels = (ceps_theo !== null && pct_v !== null) ? ceps_theo * pct_v : null;
+    const nbc = toN(p.nb_ceps_comptes);
+    const nbg = toN(p.nb_grappes);
+    const pg = toN(p.poids_grappe);
+    const pp = toN(p.pct_pertes);
+    const rj = toN(p.rdt_jus);
+
+    let kgha_brut = null, kgha_corr = null, hlha = null, prod = null;
+    if (ceps_reels && nbg && pg) {
+      kgha_brut = ceps_reels * nbg * pg / 1000;
+      kgha_corr = kgha_brut * (1 - (pp || 0));
+      if (rj) hlha = kgha_corr / rj;
+    }
+    if (hlha && toN(p.surface)) prod = hlha * toN(p.surface);
+
+    // Fiabilité
+    let fiab = null;
+    if (nbc !== null) {
+      if (nbc >= 20) fiab = { txt: '✔ Fiable (≥20 ceps)', cls: 'badge-ok' };
+      else if (nbc >= 10) fiab = { txt: '⚠ Acceptable (10-19)', cls: 'badge-warn' };
+      else fiab = { txt: '✘ Insuffisant (<10)', cls: 'badge-err' };
+    }
+
+    // Plafond
+    const app = this.state.appellations.find(a => a.nom === p.appellation);
+    const plafond = app ? app.butoir : null;
+    let ecart = null;
+    if (plafond !== null && hlha !== null) {
+      const d = plafond - hlha;
+      ecart = d >= 0
+        ? { txt: `✔ Sous plafond (${d.toFixed(1)} hl/ha)`, cls: 'badge-ok' }
+        : { txt: `⚠ Dépasse de ${(-d).toFixed(1)} hl/ha`, cls: 'badge-warn' };
+    }
+
+    // Alerte cohérence
+    let alerte = null;
+    if (hlha !== null) {
+      if (hlha > 150) alerte = 'Rendement très élevé (>150 hl/ha). Vérifier les paramètres.';
+      else if (hlha < 10 && hlha > 0) alerte = 'Rendement très faible (<10 hl/ha). Vérifier les paramètres.';
+    }
+
+    return { ceps_theo, ceps_reels, kgha_brut, kgha_corr, hlha, prod, fiab, plafond, ecart, alerte };
+  },
+
+  renderParcelleCard(p, i) {
+    const card = document.createElement('div');
+    card.className = 'parcelle-card';
+    card.dataset.index = i;
+
+    // Liste appellations actives
+    const actives = this.state.appellations.filter(a => a.actif).sort((a, b) => a.nom.localeCompare(b.nom));
+    const optionsAppel = ['<option value=""></option>', ...actives.map(a =>
+      `<option value="${this.esc(a.nom)}"${p.appellation === a.nom ? ' selected' : ''}>${this.esc(a.nom)}</option>`
+    )].join('');
+
+    const optionsCoul = ['', 'Rouge', 'Rosé', 'Blanc', 'Autre'].map(x =>
+      `<option value="${x}"${p.couleur === x ? ' selected' : ''}>${x}</option>`
+    ).join('');
+
+    // Conversion % pour affichage en entier (ex: 0.95 → 95, 0.10 → 10)
+    const pctToDisplay = v => {
+      if (v === '' || v === null || v === undefined) return '';
+      const n = parseFloat(v);
+      if (isNaN(n)) return '';
+      return Math.round(n * 100);
+    };
+    const pctVivantsDisp = p.pct_vivants === '' || p.pct_vivants === undefined ? 95 : pctToDisplay(p.pct_vivants);
+    const pctPertesDisp = p.pct_pertes === '' || p.pct_pertes === undefined ? 0 : pctToDisplay(p.pct_pertes);
+
+    card.innerHTML = `
+      <div class="parcelle-header" data-toggle>
+        <div>
+          <div class="title" data-titre>▶ ${this.esc(p.nom || `Parcelle ${i + 1}`)}</div>
+          <div class="meta" data-meta>${this.esc([p.cepage, p.appellation].filter(Boolean).join(' • ') || 'Non renseignée')}</div>
+        </div>
+        <div>
+          <span data-sumright></span>
+          <span class="chevron">▾</span>
+        </div>
+      </div>
+      <div class="parcelle-body">
+
+        <div class="field"><label>Nom / lieu-dit <span class="req">*</span></label>
+          <input type="text" data-p="nom" value="${this.esc(p.nom)}"></div>
+
+        <div class="row-2">
+          <div class="field"><label>Surface (ha) <span class="req">*</span></label>
+            <input type="number" step="0.01" data-p="surface" inputmode="decimal" value="${this.esc(p.surface)}"></div>
+          <div class="field"><label>Âge vigne (ans)</label>
+            <input type="number" data-p="age" inputmode="numeric" value="${this.esc(p.age || '')}"></div>
+        </div>
+
+        <div class="field ac-wrap">
+          <label>Cépage <span class="req">*</span></label>
+          <input type="text" data-p="cepage" data-autocomplete="cepage" value="${this.esc(p.cepage)}" autocomplete="off">
+          <div class="ac-list hidden" data-ac-for="cepage"></div>
+          <div class="text-muted" data-cep-couleur-hint></div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>Appellation / IGP <span class="req">*</span></label>
+            <select data-p="appellation">${optionsAppel}</select>
+            ${actives.length === 0 ? '<div class="text-muted mt-10">⚠ Aucune appellation active. Allez dans l\'onglet Appellations pour en cocher.</div>' : ''}
+          </div>
+          <div class="field">
+            <label>Couleur du vin <span class="req">*</span></label>
+            <select data-p="couleur">${optionsCoul}</select>
+            <div class="text-muted">Distingue rouge / rosé / blanc pour une même appellation</div>
+          </div>
+        </div>
+        <div data-plafond-box></div>
+
+        <h4 style="color:var(--bleu); font-size:12px; margin:14px 0 8px 0; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--gris-bord); padding-bottom:4px;">Densité</h4>
+        <div class="row-2">
+          <div class="field"><label>Écartement rangs (m) <span class="req">*</span></label>
+            <input type="number" step="0.01" data-p="ecart_rangs" inputmode="decimal" value="${this.esc(p.ecart_rangs)}"></div>
+          <div class="field"><label>Écartement ceps (m) <span class="req">*</span></label>
+            <input type="number" step="0.01" data-p="ecart_ceps" inputmode="decimal" value="${this.esc(p.ecart_ceps)}"></div>
+        </div>
+        <div class="row-2">
+          <div class="field"><label>Ceps théoriques / ha</label>
+            <input class="result" readonly data-r="ceps_theo" value=""></div>
+          <div class="field"><label>% ceps vivants <span class="req">*</span></label>
+            <input type="number" step="1" min="0" max="100" data-p="pct_vivants" data-pct inputmode="numeric" value="${pctVivantsDisp}">
+            <div class="text-muted">Saisir en % (ex : 95)</div>
+          </div>
+        </div>
+        <div class="field"><label>Ceps réels / ha (vivants)</label>
+          <input class="result" readonly data-r="ceps_reels" value=""></div>
+
+        <h4 style="color:var(--bleu); font-size:12px; margin:14px 0 8px 0; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--gris-bord); padding-bottom:4px;">Comptage terrain</h4>
+        <div class="row-2">
+          <div class="field"><label>Nb points de comptage <span class="req">*</span></label>
+            <input type="number" data-p="nb_points_comptage" inputmode="numeric" value="${this.esc(p.nb_points_comptage || '')}">
+            <div class="text-muted">Recommandé : 1 point / ha</div>
+          </div>
+          <div class="field"><label>Nb ceps comptés / point <span class="req">*</span></label>
+            <input type="number" data-p="nb_ceps_comptes" inputmode="numeric" value="${this.esc(p.nb_ceps_comptes)}">
+            <div class="text-muted">Minimum 4 ceps par point</div>
+          </div>
+        </div>
+        <div data-fiab-box></div>
+        <div class="field"><label>Nb grappes / cep (moy) <span class="req">*</span></label>
+          <input type="number" step="0.1" data-p="nb_grappes" inputmode="decimal" value="${this.esc(p.nb_grappes)}"></div>
+        <div class="field"><label>Poids moyen grappe (g) <span class="req">*</span></label>
+          <input type="number" data-p="poids_grappe" inputmode="numeric" value="${this.esc(p.poids_grappe)}">
+          <div class="hint-abaque hidden" data-abaque-hint></div>
+        </div>
+
+        <h4 style="color:var(--bleu); font-size:12px; margin:14px 0 8px 0; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--gris-bord); padding-bottom:4px;">Ajustements</h4>
+        <div class="row-2">
+          <div class="field"><label>% pertes</label>
+            <input type="number" step="1" min="0" max="100" data-p="pct_pertes" data-pct inputmode="numeric" value="${pctPertesDisp}">
+            <div class="text-muted">Millerandage, coulure, maladies, flétrissement…</div>
+          </div>
+          <div class="field"><label>Rendement jus (kg/hl)</label>
+            <input type="number" data-p="rdt_jus" inputmode="numeric" value="${this.esc(p.rdt_jus)}"></div>
+        </div>
+
+        <div data-resultat-box></div>
+
+        <div class="btn-group mt-10">
+          <button class="btn btn-danger btn-small" data-delete>🗑 Supprimer cette parcelle</button>
+        </div>
+
+      </div>
+    `;
+
+    // === Toggle ouverture/fermeture ===
+    card.querySelector('[data-toggle]').onclick = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' ||
+          e.target.closest('.ac-list')) return;
+      card.classList.toggle('open');
+    };
+
+    // === Binding inputs (pas de re-render complet) ===
+    card.querySelectorAll('[data-p]').forEach(el => {
+      const key = el.dataset.p;
+      const isPct = el.hasAttribute('data-pct');
+      const isSelect = el.tagName === 'SELECT';
+      const evtName = isSelect ? 'change' : 'input';
+
+      el.addEventListener(evtName, () => {
+        const idx = parseInt(card.dataset.index, 10);
+        const parcelle = this.state.parcelles[idx];
+        if (!parcelle) return;
+
+        if (isPct) {
+          // Pour les %, stocker en décimal (0.95) mais l'utilisateur tape 95
+          const v = el.value;
+          parcelle[key] = v === '' ? '' : (parseFloat(v) / 100);
+        } else {
+          parcelle[key] = el.value;
+        }
+
+        this.sauver();
+        this.rafraichirDerives(card, parcelle);
+
+        // Header (titre/meta/badge) toujours mis à jour
+        this.majHeader(card, parcelle, idx);
+      });
+    });
+
+    // === Autocomplete cépage ===
+    this.bindAutocompleteCepage(card);
+
+    // === Delete ===
+    card.querySelector('[data-delete]').onclick = () => {
+      if (confirm('Supprimer cette parcelle ?')) {
+        const idx = parseInt(card.dataset.index, 10);
+        this.state.parcelles.splice(idx, 1);
+        this.sauver();
+        this.renderParcelles();
+      }
+    };
+
+    // Initial derived render
+    this.rafraichirDerives(card, p);
+    this.majHeader(card, p, i);
+
+    return card;
+  },
+
+  // === MAJ header (titre, meta, badge hl/ha) ===
+  majHeader(card, p, i) {
+    const titre = p.nom || `Parcelle ${i + 1}`;
+    const meta = [p.cepage, p.appellation].filter(Boolean).join(' • ') || 'Non renseignée';
+    card.querySelector('[data-titre]').textContent = '▶ ' + titre;
+    card.querySelector('[data-meta]').textContent = meta;
+
+    const c = this.calcul(p);
+    const sr = card.querySelector('[data-sumright]');
+    if (c.hlha !== null) {
+      sr.innerHTML = `<span class="badge badge-info">${c.hlha.toFixed(1)} hl/ha</span>`;
+    } else {
+      sr.innerHTML = `<span class="text-muted" style="font-size:11px;">—</span>`;
+    }
+  },
+
+  // === MAJ zones calculées sans perdre le focus ===
+  rafraichirDerives(card, p) {
+    const c = this.calcul(p);
+
+    // Ceps théo/réels
+    const cthe = card.querySelector('[data-r="ceps_theo"]');
+    if (cthe) cthe.value = c.ceps_theo !== null ? Math.round(c.ceps_theo).toLocaleString('fr-FR') : '';
+    const creel = card.querySelector('[data-r="ceps_reels"]');
+    if (creel) creel.value = c.ceps_reels !== null ? Math.round(c.ceps_reels).toLocaleString('fr-FR') : '';
+
+    // Bloc plafond
+    const pbox = card.querySelector('[data-plafond-box]');
+    if (pbox) {
+      pbox.innerHTML = c.plafond !== null
+        ? `<div style="font-size:12px; color:var(--bleu); background:var(--bleu-clr); padding:5px 10px; border-radius:6px; margin:4px 0 12px 0; display:inline-block;">
+            Plafond autorisé : <strong>${c.plafond} hl/ha</strong></div>`
+        : '';
+    }
+
+    // Bloc fiabilité + alertes ceps
+    const fbox = card.querySelector('[data-fiab-box]');
+    if (fbox) {
+      let html = '';
+      const surf = parseFloat(p.surface) || 0;
+      const nbPts = parseFloat(p.nb_points_comptage) || 0;
+      const nbCeps = parseFloat(p.nb_ceps_comptes);
+
+      // Validation points de comptage vs surface (style badge comme nb ceps)
+      if (surf > 0 && nbPts > 0) {
+        const mini = Math.ceil(surf);
+        if (nbPts < mini) {
+          html += `<div style="margin:6px 0;"><span class="badge badge-err">✘ Points insuffisants (${nbPts}/${mini} mini)</span></div>`;
+        } else {
+          html += `<div style="margin:6px 0;"><span class="badge badge-ok">✔ Points suffisants (≥${mini})</span></div>`;
+        }
+      }
+
+      // Validation nb ceps comptés
+      if (!isNaN(nbCeps) && nbCeps > 0) {
+        if (nbCeps < 4) {
+          html += `<div style="margin:6px 0;"><span class="badge badge-err">✘ Minimum 4 ceps / point</span></div>`;
+        } else if (nbCeps < 10) {
+          html += `<div style="margin:6px 0;"><span class="badge badge-err">✘ Insuffisant (<10)</span></div>`;
+        } else if (nbCeps < 20) {
+          html += `<div style="margin:6px 0;"><span class="badge badge-warn">⚠ Acceptable (10-19)</span></div>`;
+        } else {
+          html += `<div style="margin:6px 0;"><span class="badge badge-ok">✔ Fiable (≥20 ceps)</span></div>`;
+        }
+      }
+
+      fbox.innerHTML = html;
+    }
+
+    // Rappel abaque cépage sous poids grappe
+    const abox = card.querySelector('[data-abaque-hint]');
+    const cepageSaisi = (p.cepage || '').toLowerCase().trim();
+    const match = cepageSaisi ? CEPAGES.find(c =>
+      c[0].toLowerCase() === cepageSaisi ||
+      c[0].toLowerCase().includes(cepageSaisi) ||
+      cepageSaisi.includes(c[0].toLowerCase())
+    ) : null;
+    if (abox) {
+      if (match) {
+        abox.innerHTML = `À titre indicatif : poids moyen <strong>${this.esc(match[0])}</strong> = <strong>${match[3]} g</strong> (min ${match[2]} g / max ${match[4]} g)`;
+        abox.classList.remove('hidden');
+      } else {
+        abox.innerHTML = '';
+        abox.classList.add('hidden');
+      }
+    }
+
+    // Hint couleur cépage automatique (sous le champ cépage)
+    const chint = card.querySelector('[data-cep-couleur-hint]');
+    if (chint) {
+      if (match) {
+        chint.innerHTML = `Cépage ${match[1].toLowerCase()} identifié automatiquement`;
+      } else {
+        chint.innerHTML = '';
+      }
+    }
+
+    // Bloc résultat
+    const rbox = card.querySelector('[data-resultat-box]');
+    if (rbox) {
+      if (c.hlha !== null) {
+        let html = `<div class="result-box">
+            <span class="label">Rendement estimé</span>
+            ${c.hlha.toFixed(1)} <span style="font-size:14px;">hl/ha</span>
+          </div>`;
+        if (c.ecart) html += `<div class="text-center mb-10"><span class="badge ${c.ecart.cls}">${c.ecart.txt}</span></div>`;
+        if (c.alerte) html += `<div class="note error">⚠ ${c.alerte}</div>`;
+        html += `<div class="row-2">
+            <div class="field"><label>Kg/ha brut</label>
+              <input class="result" readonly value="${Math.round(c.kgha_brut).toLocaleString('fr-FR')}"></div>
+            <div class="field"><label>Kg/ha corrigé</label>
+              <input class="result" readonly value="${Math.round(c.kgha_corr).toLocaleString('fr-FR')}"></div>
+          </div>`;
+        if (c.prod !== null) html += `<div class="field"><label>Production parcelle</label>
+            <input class="result" readonly value="${c.prod.toFixed(1)} hl"></div>`;
+        rbox.innerHTML = html;
+      } else {
+        rbox.innerHTML = '<div class="note">Renseigner les champs de densité, comptage et ajustements pour voir le rendement estimé.</div>';
+      }
+    }
+  },
+
+  // === Autocomplete cépage (couleur affichée en hint, pas copiée dans couleur vin) ===
+  bindAutocompleteCepage(card) {
+    const input = card.querySelector('[data-autocomplete="cepage"]');
+    const list = card.querySelector('[data-ac-for="cepage"]');
+    if (!input || !list) return;
+
+    const showMatches = (term) => {
+      term = (term || '').toLowerCase().trim();
+      const matches = term
+        ? CEPAGES.filter(c => c[0].toLowerCase().includes(term)).slice(0, 8)
+        : [];
+      if (matches.length === 0) { list.classList.add('hidden'); return; }
+      list.innerHTML = matches.map(c => {
+        const tag = c[1] === 'Rouge' ? '<span class="tag r">R</span>' : '<span class="tag b">B</span>';
+        return `<div class="ac-item" data-val="${this.esc(c[0])}">${tag}${this.esc(c[0])}</div>`;
+      }).join('');
+      list.classList.remove('hidden');
+      // Bindings
+      list.querySelectorAll('.ac-item').forEach(item => {
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault(); // évite blur
+          const val = item.dataset.val;
+          input.value = val;
+          const idx = parseInt(card.dataset.index, 10);
+          const parcelle = this.state.parcelles[idx];
+          if (parcelle) {
+            parcelle.cepage = val;
+            this.sauver();
+            this.majHeader(card, parcelle, idx);
+            this.rafraichirDerives(card, parcelle);
+          }
+          list.classList.add('hidden');
+        });
+      });
+    };
+
+    input.addEventListener('focus', () => showMatches(input.value));
+    input.addEventListener('input', () => showMatches(input.value));
+    input.addEventListener('blur', () => {
+      setTimeout(() => list.classList.add('hidden'), 200);
+    });
+  },
+
+  // ─── PLAFONDS ───
+  renderPlafonds() {
+    const cont = document.getElementById('plafonds-list');
+    const terme = (document.getElementById('plafond-search').value || '').toLowerCase().trim();
+    const filtre = this.state.filtreAppel;
+
+    let liste = this.state.appellations.slice().sort((a, b) => a.nom.localeCompare(b.nom));
+    if (filtre === 'aop') liste = liste.filter(a => a.cat === 'AOP');
+    else if (filtre === 'igp') liste = liste.filter(a => a.cat === 'IGP');
+    else if (filtre === 'vdp') liste = liste.filter(a => a.cat === 'VDP' || a.cat === 'VSIG');
+    else if (filtre === 'actives') liste = liste.filter(a => a.actif);
+    if (terme) liste = liste.filter(a =>
+      a.nom.toLowerCase().includes(terme) ||
+      (a.region || '').toLowerCase().includes(terme)
+    );
+
+    cont.innerHTML = liste.length ? '' : '<div class="text-muted text-center mt-10">Aucune appellation ne correspond.</div>';
+
+    liste.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'plafond-item' + (a.actif ? ' actif' : '');
+      div.innerHTML = `
+        <div class="toggle"></div>
+        <div class="info">
+          <div class="name">${this.esc(a.nom)}</div>
+          <div class="meta">
+            <span class="badge-cat${a.cat === 'IGP' ? ' igp' : a.cat === 'VDP' || a.cat === 'VSIG' ? ' vdp' : ''}">${a.cat}</span>
+            ${this.esc(a.coul)} • ${this.esc(a.region)}
+          </div>
+        </div>
+        <div class="yields">${a.base}${a.base !== a.butoir ? '-' + a.butoir : ''} hl/ha</div>
+      `;
+      div.onclick = () => {
+        a.actif = !a.actif;
+        this.sauver();
+        this.renderPlafonds();
+      };
+      // Swipe delete - long press
+      let pressTimer;
+      div.addEventListener('touchstart', () => {
+        pressTimer = setTimeout(() => {
+          if (confirm(`Supprimer l'appellation "${a.nom}" ?`)) {
+            this.state.appellations = this.state.appellations.filter(x => x !== a);
+            this.sauver();
+            this.renderPlafonds();
+          }
+        }, 600);
+      });
+      div.addEventListener('touchend', () => clearTimeout(pressTimer));
+      div.addEventListener('touchmove', () => clearTimeout(pressTimer));
+      // Double-click desktop for delete
+      div.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        if (confirm(`Supprimer l'appellation "${a.nom}" ?`)) {
+          this.state.appellations = this.state.appellations.filter(x => x !== a);
+          this.sauver();
+          this.renderPlafonds();
+        }
+      });
+      cont.appendChild(div);
+    });
+
+    document.getElementById('nb-actives').textContent = this.state.appellations.filter(a => a.actif).length;
+    document.getElementById('nb-total').textContent = this.state.appellations.length;
+  },
+
+  initFiltres() {
+    const btns = {
+      'filter-all': 'all',
+      'filter-aop': 'aop',
+      'filter-igp': 'igp',
+      'filter-vdp': 'vdp',
+      'filter-actives': 'actives',
+    };
+    Object.entries(btns).forEach(([id, val]) => {
+      document.getElementById(id).onclick = () => {
+        this.state.filtreAppel = val;
+        Object.keys(btns).forEach(x => {
+          document.getElementById(x).classList.toggle('btn-primary', btns[x] === val);
+          document.getElementById(x).classList.toggle('btn-secondary', btns[x] !== val);
+        });
+        this.renderPlafonds();
+      };
+    });
+  },
+
+  initRecherche() {
+    document.getElementById('plafond-search').addEventListener('input', () => this.renderPlafonds());
+  },
+
+  resetActives() {
+    if (confirm('Désactiver toutes les appellations ?')) {
+      this.state.appellations.forEach(a => a.actif = false);
+      this.sauver();
+      this.renderPlafonds();
+    }
+  },
+
+  ouvrirModalAppel() {
+    document.getElementById('na-nom').value = '';
+    document.getElementById('na-cat').value = 'AOP';
+    document.getElementById('na-coul').value = '';
+    document.getElementById('na-base').value = '';
+    document.getElementById('na-butoir').value = '';
+    document.getElementById('na-region').value = '';
+    document.getElementById('modal-appel').classList.add('open');
+  },
+
+  ajouterAppellation() {
+    const nom = document.getElementById('na-nom').value.trim();
+    if (!nom) { alert('Le nom est obligatoire'); return; }
+    const base = parseFloat(document.getElementById('na-base').value) || 0;
+    const butoir = parseFloat(document.getElementById('na-butoir').value) || base;
+    this.state.appellations.push({
+      nom,
+      cat: document.getElementById('na-cat').value,
+      coul: document.getElementById('na-coul').value.trim(),
+      base, butoir,
+      region: document.getElementById('na-region').value.trim(),
+      actif: true
+    });
+    this.sauver();
+    this.renderPlafonds();
+    document.getElementById('modal-appel').classList.remove('open');
+  },
+
+  // ─── RÉCAP ───
+  renderRecap() {
+    // Dossier
+    const d = this.state.dossier;
+    const dInfo = document.getElementById('recap-dossier');
+    const presences = [];
+    if (d.presence_agent) presences.push('Agent');
+    if (d.presence_inspecteur) presences.push('Inspecteur');
+
+    dInfo.innerHTML = `
+      <table>
+        <tr><th>N° contrat</th><td>${this.esc(d.contrat) || '—'}</td><th>N° expertise</th><td>${this.esc(d.expertise) || '—'}</td></tr>
+        <tr><th>Assuré</th><td colspan="3">${this.esc(d.assure) || '—'}</td></tr>
+        <tr><th>Adresse</th><td colspan="3">${this.esc(d.adresse) || '—'}</td></tr>
+        <tr><th>Commune</th><td>${this.esc(d.commune) || '—'}</td><th>Département</th><td>${this.esc(d.departement) || '—'}</td></tr>
+        <tr><th>Sinistre</th><td>${this.esc(d.sinistre) || '—'}</td><th>Date visite</th><td>${this.esc(d.date_visite) || '—'}</td></tr>
+        <tr><th>Expert(s)</th><td>${this.esc(d.expert) || '—'}</td><th>Niveau</th><td>${this.esc(d.niveau) || '—'}</td></tr>
+        <tr><th>Surface totale</th><td>${d.surface_totale ? d.surface_totale + ' ha' : '—'}</td><th>Présences</th><td>${presences.length ? this.esc(presences.join(', ')) : '—'}</td></tr>
+      </table>
+    `;
+
+    // Détail parcelles
+    const detail = document.getElementById('recap-detail');
+    let totSurf = 0, totProd = 0, totPondRdt = 0, totPondSurf = 0;
+    const rows = this.state.parcelles.map((p, i) => {
+      const c = this.calcul(p);
+      if (c.hlha !== null) {
+        const s = parseFloat(p.surface) || 0;
+        if (s > 0) {
+          totSurf += s;
+          totProd += c.prod || 0;
+          totPondRdt += c.hlha * s;
+          totPondSurf += s;
+        }
+      }
+      return `<tr>
+        <td>${i + 1}</td>
+        <td>${this.esc(p.nom || '—')}</td>
+        <td>${this.esc(p.cepage || '—')}</td>
+        <td>${this.esc(p.appellation || '—')}</td>
+        <td class="num">${p.surface ? parseFloat(p.surface).toFixed(2) : '—'}</td>
+        <td class="num">${c.hlha !== null ? c.hlha.toFixed(1) : '—'}</td>
+        <td class="num">${c.prod !== null ? c.prod.toFixed(1) : '—'}</td>
+        <td class="num">${c.plafond !== null ? c.plafond : '—'}</td>
+      </tr>`;
+    }).join('');
+
+    const rdtMoyen = totPondSurf > 0 ? totPondRdt / totPondSurf : null;
+    detail.innerHTML = this.state.parcelles.length ? `
+      <table>
+        <thead><tr>
+          <th>N°</th><th>Parcelle</th><th>Cépage</th><th>Appellation</th>
+          <th class="num">Surface (ha)</th><th class="num">Rdt (hl/ha)</th>
+          <th class="num">Prod (hl)</th><th class="num">Plafond</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr>
+          <td colspan="4">TOTAL DOSSIER</td>
+          <td class="num">${totSurf.toFixed(2)}</td>
+          <td class="num">${rdtMoyen !== null ? rdtMoyen.toFixed(1) : '—'}</td>
+          <td class="num">${totProd.toFixed(1)}</td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+    ` : '<div class="text-muted text-center">Aucune parcelle saisie.</div>';
+
+    // Synthèse par appellation + couleur
+    const parApp = {};
+    this.state.parcelles.forEach(p => {
+      if (!p.appellation) return;
+      const c = this.calcul(p);
+      if (c.hlha === null || !p.surface) return;
+      const couleur = p.couleur || '—';
+      const cle = p.appellation + '|' + couleur;
+      if (!parApp[cle]) {
+        parApp[cle] = { nom: p.appellation, couleur, nb: 0, surf: 0, prod: 0, plafond: c.plafond };
+      }
+      const s = parseFloat(p.surface);
+      parApp[cle].nb++;
+      parApp[cle].surf += s;
+      parApp[cle].prod += c.prod;
+    });
+
+    const appEl = document.getElementById('recap-appellation');
+    const appRows = Object.entries(parApp).map(([cle, x]) => {
+      const rdt = x.surf > 0 ? x.prod / x.surf : 0;
+      let ecart = '—';
+      if (x.plafond !== null) {
+        const d = x.plafond - rdt;
+        ecart = d >= 0
+          ? `<span class="badge badge-ok">✔ ${d.toFixed(1)} hl/ha</span>`
+          : `<span class="badge badge-warn">⚠ +${(-d).toFixed(1)} hl/ha</span>`;
+      }
+      const libelleCouleur = x.couleur && x.couleur !== '—'
+        ? `<span class="badge badge-info" style="margin-left:4px; font-size:10px;">${this.esc(x.couleur)}</span>`
+        : '';
+      return `<tr>
+        <td><strong>${this.esc(x.nom)}</strong>${libelleCouleur}</td>
+        <td class="num">${x.nb}</td>
+        <td class="num">${x.surf.toFixed(2)}</td>
+        <td class="num">${rdt.toFixed(1)}</td>
+        <td class="num">${x.prod.toFixed(1)}</td>
+        <td class="num">${x.plafond !== null ? x.plafond : '—'}</td>
+        <td>${ecart}</td>
+      </tr>`;
+    }).join('');
+
+    appEl.innerHTML = Object.keys(parApp).length ? `
+      <table>
+        <thead><tr>
+          <th>Appellation + couleur</th><th class="num">Nb</th>
+          <th class="num">Surf. (ha)</th><th class="num">Rdt moy (hl/ha)</th>
+          <th class="num">Prod (hl)</th><th class="num">Plafond</th><th>Écart</th>
+        </tr></thead>
+        <tbody>${appRows}</tbody>
+      </table>
+    ` : '<div class="text-muted text-center">Pas encore de données agrégeables.</div>';
+  },
+
+  renderAbaque() {
+    const rouges = document.getElementById('cepages-rouges');
+    const blancs = document.getElementById('cepages-blancs');
+    rouges.innerHTML = '';
+    blancs.innerHTML = '';
+    CEPAGES.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'abaque-card ' + (c[1] === 'Rouge' ? 'rouge' : 'blanc');
+      div.innerHTML = `
+        <div class="name">${c[0]}</div>
+        <div class="values">Min: ${c[2]}g • <span class="main">Moy: ${c[3]}g</span> • Max: ${c[4]}g</div>
+      `;
+      (c[1] === 'Rouge' ? rouges : blancs).appendChild(div);
+    });
+
+    const jusEl = document.getElementById('jus-list');
+    jusEl.innerHTML = JUS.map(j => `
+      <div class="plafond-item" style="cursor:default;">
+        <div class="info">
+          <div class="name">${j[0]}</div>
+        </div>
+        <div class="yields">${j[1]} kg/hl</div>
+      </div>
+    `).join('');
+  },
+
+  // ─── EXPORTS ───
+  exporterJSON() {
+    const blob = new Blob([JSON.stringify(this.state, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const nom = this.nomFichierBase();
+    a.href = url;
+    a.download = `${nom}_${this.dateFilename()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  importerJSON() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const s = JSON.parse(ev.target.result);
+          if (!confirm('Importer ce dossier remplacera les données actuelles. Continuer ?')) return;
+          this.state.dossier = s.dossier || {};
+          this.state.parcelles = s.parcelles || [];
+          if (s.appellations) this.state.appellations = s.appellations;
+          this.sauver();
+          // Reload complet
+          location.reload();
+        } catch (e) { alert('Fichier invalide : ' + e.message); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  },
+
+  nouveauDossier() {
+    this.closeExportMenu();
+    this.closeNewMenu();
+    document.getElementById('modal-nouvelle-saisie').classList.add('open');
+  },
+
+  confirmerNouveauDossier() {
+    this.state.dossier = {};
+    this.state.parcelles = [];
+    // On conserve les appellations et leurs actifs
+    this.sauver();
+    location.reload();
+  },
+
+  sauvegarderPuisNouveau() {
+    // Déclenche l'export JSON puis attend un instant avant d'effacer
+    this.exporterJSON();
+    setTimeout(() => {
+      this.confirmerNouveauDossier();
+    }, 800);
+  },
+
+  toggleExportMenu(e) {
+    if (e) e.stopPropagation();
+    this.closeNewMenu();
+    document.getElementById('export-menu').classList.toggle('hidden');
+  },
+
+  closeExportMenu() {
+    document.getElementById('export-menu').classList.add('hidden');
+  },
+
+  toggleNewMenu(e) {
+    if (e) e.stopPropagation();
+    this.closeExportMenu();
+    document.getElementById('new-menu').classList.toggle('hidden');
+  },
+
+  closeNewMenu() {
+    const m = document.getElementById('new-menu');
+    if (m) m.classList.add('hidden');
+  },
+
+  exporterExcel() {
+    const wb = XLSX.utils.book_new();
+
+    // Feuille dossier
+    const d = this.state.dossier;
+    const presences = [];
+    if (d.presence_agent) presences.push('Agent');
+    if (d.presence_inspecteur) presences.push('Inspecteur');
+
+    const dossierData = [
+      ['INFORMATIONS DOSSIER'],
+      ['N° contrat', d.contrat || ''],
+      ['N° expertise', d.expertise || ''],
+      ['Assuré', d.assure || ''],
+      ['Adresse', d.adresse || ''],
+      ['Commune', d.commune || ''],
+      ['Département', d.departement || ''],
+      ['Type sinistre', d.sinistre || ''],
+      ['Expert(s)', d.expert || ''],
+      ['Date visite', d.date_visite || ''],
+      ['Niveau complexité', d.niveau || ''],
+      ['Surface totale assurée (ha)', d.surface_totale || ''],
+      ['Présences lors visite', presences.join(', ')],
+    ];
+    const ws1 = XLSX.utils.aoa_to_sheet(dossierData);
+    XLSX.utils.book_append_sheet(wb, ws1, 'Dossier');
+
+    // Feuille parcelles détail
+    const parcData = [[
+      'N°', 'Parcelle', 'Cépage', 'Couleur', 'Appellation', 'Surface (ha)', 'Âge vigne',
+      'Écart. rangs', 'Écart. ceps', 'Ceps/ha', '% vivants',
+      'Nb pts comptage', 'Nb ceps/pt', 'Grappes/cep', 'Poids grappe (g)',
+      '% pertes', 'Rdt jus (kg/hl)',
+      'Rdt estimé (hl/ha)', 'Production (hl)', 'Plafond AOP'
+    ]];
+    this.state.parcelles.forEach((p, i) => {
+      const c = this.calcul(p);
+      parcData.push([
+        i + 1, p.nom, p.cepage, p.couleur, p.appellation, parseFloat(p.surface) || '',
+        parseFloat(p.age) || '',
+        parseFloat(p.ecart_rangs) || '', parseFloat(p.ecart_ceps) || '',
+        c.ceps_reels !== null ? Math.round(c.ceps_reels) : '',
+        p.pct_vivants !== '' && p.pct_vivants !== null ? Math.round(parseFloat(p.pct_vivants) * 100) + '%' : '',
+        parseFloat(p.nb_points_comptage) || '',
+        parseFloat(p.nb_ceps_comptes) || '',
+        parseFloat(p.nb_grappes) || '',
+        parseFloat(p.poids_grappe) || '',
+        p.pct_pertes !== '' && p.pct_pertes !== null ? Math.round(parseFloat(p.pct_pertes) * 100) + '%' : '',
+        parseFloat(p.rdt_jus) || '',
+        c.hlha !== null ? Number(c.hlha.toFixed(2)) : '',
+        c.prod !== null ? Number(c.prod.toFixed(2)) : '',
+        c.plafond !== null ? c.plafond : ''
+      ]);
+    });
+    const ws2 = XLSX.utils.aoa_to_sheet(parcData);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Parcelles');
+
+    // Synthèse appellation + couleur
+    const parApp = {};
+    this.state.parcelles.forEach(p => {
+      if (!p.appellation) return;
+      const c = this.calcul(p);
+      if (c.hlha === null || !p.surface) return;
+      const couleur = p.couleur || '—';
+      const cle = p.appellation + '|' + couleur;
+      if (!parApp[cle]) {
+        parApp[cle] = { nom: p.appellation, couleur, nb: 0, surf: 0, prod: 0, plafond: c.plafond };
+      }
+      const s = parseFloat(p.surface);
+      parApp[cle].nb++;
+      parApp[cle].surf += s;
+      parApp[cle].prod += c.prod;
+    });
+    const synthData = [['Appellation', 'Couleur', 'Nb parcelles', 'Surface cumulée (ha)', 'Rdt moyen pondéré (hl/ha)', 'Production totale (hl)', 'Plafond AOP', 'Écart vs plafond']];
+    Object.values(parApp).forEach(x => {
+      const rdt = x.surf > 0 ? x.prod / x.surf : 0;
+      const ecart = x.plafond !== null ? (x.plafond - rdt) : '';
+      synthData.push([x.nom, x.couleur, x.nb, Number(x.surf.toFixed(2)), Number(rdt.toFixed(2)),
+        Number(x.prod.toFixed(2)), x.plafond, typeof ecart === 'number' ? Number(ecart.toFixed(2)) : '']);
+    });
+    const ws3 = XLSX.utils.aoa_to_sheet(synthData);
+    XLSX.utils.book_append_sheet(wb, ws3, 'Synthèse appellation');
+
+    const nom = this.nomFichierBase();
+    XLSX.writeFile(wb, `${nom}_${this.dateFilename()}.xlsx`);
+  },
+
+  exporterPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const w = 210, m = 14;
+    let y = m;
+
+    // Titre
+    doc.setFillColor(26, 58, 107);
+    doc.rect(0, 0, w, 20, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('ABEILLE ASSURANCES', m, 9);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text("Rapport d'estimation de récolte viticole — Campagne 2026", m, 15);
+
+    y = 28;
+    doc.setTextColor(26, 58, 107);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('1. Informations dossier', m, y);
+    y += 6;
+
+    const d = this.state.dossier;
+    const presences = [];
+    if (d.presence_agent) presences.push('Agent');
+    if (d.presence_inspecteur) presences.push('Inspecteur');
+
+    const dossierRows = [
+      ['N° contrat', d.contrat || '—', 'N° expertise', d.expertise || '—'],
+      ['Assuré', d.assure || '—', '', ''],
+      ['Adresse', d.adresse || '—', '', ''],
+      ['Commune', d.commune || '—', 'Département', d.departement || '—'],
+      ['Sinistre', d.sinistre || '—', 'Date visite', d.date_visite || '—'],
+      ['Expert(s)', d.expert || '—', 'Niveau', d.niveau || '—'],
+      ['Surface totale', d.surface_totale ? d.surface_totale + ' ha' : '—', 'Présences', presences.join(', ') || '—'],
+    ];
+    doc.autoTable({
+      startY: y,
+      body: dossierRows,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 2 },
+      columnStyles: {
+        0: { fontStyle: 'bold', fillColor: [214, 228, 240], cellWidth: 38 },
+        1: { cellWidth: 52 },
+        2: { fontStyle: 'bold', fillColor: [214, 228, 240], cellWidth: 38 },
+        3: { cellWidth: 54 },
+      }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // Détail parcelles
+    if (y > 240) { doc.addPage(); y = m; }
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(26, 58, 107);
+    doc.text('2. Détail par parcelle', m, y);
+    y += 4;
+
+    let totSurf = 0, totProd = 0, totPondRdt = 0;
+    const pRows = this.state.parcelles.map((p, i) => {
+      const c = this.calcul(p);
+      const s = parseFloat(p.surface) || 0;
+      if (c.hlha !== null && s > 0) {
+        totSurf += s;
+        totProd += c.prod || 0;
+        totPondRdt += c.hlha * s;
+      }
+      return [
+        i + 1,
+        p.nom || '—',
+        p.cepage || '—',
+        p.appellation || '—',
+        s ? s.toFixed(2) : '—',
+        c.hlha !== null ? c.hlha.toFixed(1) : '—',
+        c.prod !== null ? c.prod.toFixed(1) : '—',
+        c.plafond !== null ? c.plafond : '—'
+      ];
+    });
+    const rdtMoy = totSurf > 0 ? totPondRdt / totSurf : null;
+    pRows.push([
+      { content: 'TOTAL DOSSIER', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [26, 58, 107], textColor: 255 } },
+      { content: totSurf.toFixed(2), styles: { fontStyle: 'bold', fillColor: [26, 58, 107], textColor: 255, halign: 'right' } },
+      { content: rdtMoy !== null ? rdtMoy.toFixed(1) : '—', styles: { fontStyle: 'bold', fillColor: [26, 58, 107], textColor: 255, halign: 'right' } },
+      { content: totProd.toFixed(1), styles: { fontStyle: 'bold', fillColor: [26, 58, 107], textColor: 255, halign: 'right' } },
+      { content: '', styles: { fillColor: [26, 58, 107] } }
+    ]);
+
+    doc.autoTable({
+      startY: y,
+      head: [['N°', 'Parcelle', 'Cépage', 'Appellation', 'Surf (ha)', 'Rdt (hl/ha)', 'Prod (hl)', 'Plafond']],
+      body: pRows,
+      theme: 'striped',
+      headStyles: { fillColor: [26, 58, 107], textColor: 255, fontSize: 8 },
+      styles: { fontSize: 8, cellPadding: 1.5 },
+      columnStyles: {
+        0: { cellWidth: 8, halign: 'center' },
+        4: { halign: 'right' },
+        5: { halign: 'right' },
+        6: { halign: 'right' },
+        7: { halign: 'right' }
+      }
+    });
+    y = doc.lastAutoTable.finalY + 10;
+
+    // Synthèse appellation + couleur
+    const parApp = {};
+    this.state.parcelles.forEach(p => {
+      if (!p.appellation) return;
+      const c = this.calcul(p);
+      if (c.hlha === null || !p.surface) return;
+      const s = parseFloat(p.surface);
+      const couleur = p.couleur || '—';
+      const cle = p.appellation + '|' + couleur;
+      if (!parApp[cle]) parApp[cle] = { nom: p.appellation, couleur, nb: 0, surf: 0, prod: 0, plafond: c.plafond };
+      parApp[cle].nb++;
+      parApp[cle].surf += s;
+      parApp[cle].prod += c.prod;
+    });
+
+    if (Object.keys(parApp).length) {
+      if (y > 240) { doc.addPage(); y = m; }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(26, 58, 107);
+      doc.text('3. Synthèse par appellation', m, y);
+      y += 4;
+
+      const aRows = Object.values(parApp).map(x => {
+        const rdt = x.surf > 0 ? x.prod / x.surf : 0;
+        let ec = '—';
+        if (x.plafond !== null) {
+          const diff = x.plafond - rdt;
+          ec = diff >= 0 ? `✔ ${diff.toFixed(1)} hl/ha` : `⚠ +${(-diff).toFixed(1)} hl/ha`;
+        }
+        return [x.nom, x.couleur, x.nb, x.surf.toFixed(2), rdt.toFixed(1), x.prod.toFixed(1), x.plafond || '—', ec];
+      });
+      doc.autoTable({
+        startY: y,
+        head: [['Appellation', 'Couleur', 'Nb', 'Surf (ha)', 'Rdt moy', 'Prod (hl)', 'Plafond', 'Écart']],
+        body: aRows,
+        theme: 'striped',
+        headStyles: { fillColor: [26, 58, 107], textColor: 255, fontSize: 8 },
+        styles: { fontSize: 8, cellPadding: 1.5 },
+        columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'right' } }
+      });
+    }
+
+    // Pied
+    const pages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i);
+      doc.setFont('helvetica', 'italic');
+      doc.setFontSize(8);
+      doc.setTextColor(136, 136, 136);
+      doc.text(`Abeille Assurances — Généré le ${new Date().toLocaleString('fr-FR')}`, m, 292);
+      doc.text(`Page ${i} / ${pages}`, w - m, 292, { align: 'right' });
+    }
+
+    const nom = this.nomFichierBase();
+    doc.save(`${nom}_${this.dateFilename()}.pdf`);
+  },
+
+  // ─── UTILS ───
+  esc(v) {
+    if (v === null || v === undefined) return '';
+    return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  },
+
+  // Nettoyage d'une chaîne pour la rendre utilisable comme nom de fichier
+  slugFichier(s) {
+    if (!s) return '';
+    return String(s)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // enlève accents
+      .replace(/[^a-zA-Z0-9_-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40);
+  },
+
+  // Nom de base pour les exports : Assuré-N°sinistre
+  nomFichierBase() {
+    const d = this.state.dossier || {};
+    const assure = this.slugFichier(d.assure);
+    const sinistre = this.slugFichier(d.sinistre_num);
+    if (assure && sinistre) return `${assure}-${sinistre}`;
+    if (assure) return assure;
+    if (sinistre) return sinistre;
+    if (d.contrat) return this.slugFichier(d.contrat);
+    return 'dossier';
+  },
+
+  dateFilename() {
+    const d = new Date();
+    return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+};
+
+// Lancement
+document.addEventListener('DOMContentLoaded', () => {
+  app.init();
+
+  // Fermer les menus au clic extérieur
+  document.addEventListener('click', (e) => {
+    const exportMenu = document.getElementById('export-menu');
+    const newMenu = document.getElementById('new-menu');
+    const exportToggle = e.target.closest('[data-export-toggle]');
+    const newToggle = e.target.closest('[data-new-toggle]');
+    const insideExport = e.target.closest('#export-menu');
+    const insideNew = e.target.closest('#new-menu');
+    if (exportMenu && !exportMenu.classList.contains('hidden') && !exportToggle && !insideExport) {
+      exportMenu.classList.add('hidden');
+    }
+    if (newMenu && !newMenu.classList.contains('hidden') && !newToggle && !insideNew) {
+      newMenu.classList.add('hidden');
+    }
+  });
+});
+
+// Empêcher le zoom double-tap sur iOS
+let lastTouch = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouch < 300) e.preventDefault();
+  lastTouch = now;
+}, { passive: false });
+</script>
+</body>
+</html>
