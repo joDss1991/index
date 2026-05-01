@@ -131,22 +131,33 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .gps-dot{position:absolute;z-index:500;width:14px;height:14px;border-radius:50%;background:#1565C0;border:2px solid white;box-shadow:0 0 0 4px rgba(21,101,192,.25);}
 
 /* ── Fiche parcelle ── */
-.sheet{position:absolute;top:0;left:0;bottom:0;width:60vw;max-width:780px;min-width:340px;background:white;z-index:600;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 32px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;}
+.sheet{position:absolute;top:0;left:0;bottom:0;width:60vw;max-width:780px;min-width:320px;background:white;z-index:600;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 32px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;}
 .sheet.open{transform:translateX(0);}
+
+/* Bouton retour carte */
+.sh-back-bar{flex-shrink:0;display:flex;align-items:center;gap:6px;padding:8px 14px;background:#f0f4f0;border:none;border-bottom:1px solid #dce8dc;color:#2e7d32;font-size:11px;font-weight:700;cursor:pointer;width:100%;font-family:var(--font);letter-spacing:.2px;transition:background .12s;}
+.sh-back-bar:hover{background:#e0ece0;}
+.sh-back-bar svg{flex-shrink:0;}
+
 .sh-hdr{flex-shrink:0;position:relative;overflow:hidden;}
-.sh-hdr-bg{position:absolute;inset:0;opacity:.12;background:repeating-linear-gradient(45deg,currentColor,currentColor 1px,transparent 1px,transparent 8px);}
-.sh-hdr-inner{position:relative;padding:14px 16px 12px;}
-.sh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.sh-commune{font-size:16px;font-weight:700;color:white;line-height:1.2;}
-.sh-coords{font-size:9px;color:rgba(255,255,255,.7);margin-top:1px;font-family:var(--mono);}
-.sh-close{cursor:pointer;font-size:18px;padding:2px 4px;background:rgba(0,0,0,.15);border:none;color:white;border-radius:6px;transition:all .12s;}
-.sh-culture-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,.2);border-radius:6px;padding:3px 8px;font-size:9px;color:rgba(255,255,255,.85);font-family:var(--mono);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sh-tabs{display:flex;background:#f8f9fa;border-bottom:1px solid #e9ecef;flex-shrink:0;}
-.sh-tab{flex:1;padding:9px 4px;text-align:center;cursor:pointer;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#90a4ae;border-bottom:2px solid transparent;transition:all .12s;background:transparent;border-left:none;border-right:none;border-top:none;}
-.sh-tab:hover{color:#546e7a;}
-.sh-tab.on{color:var(--accent);border-bottom-color:var(--accent);background:white;}
-.sh-tab-icon{font-size:13px;display:block;margin-bottom:2px;}
-.sh-body{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;}
+.sh-hdr-bg{position:absolute;inset:0;opacity:.1;background:repeating-linear-gradient(45deg,currentColor,currentColor 1px,transparent 1px,transparent 8px);}
+.sh-hdr-inner{position:relative;padding:12px 14px 10px;}
+.sh-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;gap:8px;}
+.sh-commune{font-size:15px;font-weight:700;color:white;line-height:1.2;word-break:break-word;}
+.sh-coords{font-size:9px;color:rgba(255,255,255,.75);margin-top:2px;font-family:var(--mono);line-height:1.4;}
+.sh-close{cursor:pointer;font-size:16px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);border:none;color:white;border-radius:6px;transition:all .12s;flex-shrink:0;}
+.sh-close:hover{background:rgba(0,0,0,.35);}
+.sh-culture-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,.18);border-radius:6px;padding:3px 8px;font-size:9px;color:rgba(255,255,255,.9);font-family:var(--mono);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* Onglets */
+.sh-tabs{display:flex;background:#f8f9fa;border-bottom:2px solid #e9ecef;flex-shrink:0;}
+.sh-tab{flex:1;padding:9px 3px 8px;text-align:center;cursor:pointer;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#90a4ae;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;background:transparent;border-left:none;border-right:none;border-top:none;}
+.sh-tab:hover{color:#546e7a;background:rgba(0,0,0,.03);}
+.sh-tab.on{color:var(--gd);border-bottom-color:var(--gd);background:white;}
+.sh-tab-icon{font-size:14px;display:block;margin-bottom:1px;}
+
+/* Corps fiche */
+.sh-body{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
 .sh-pane{display:none;flex-direction:column;flex:1;}
 
 
@@ -215,7 +226,7 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .visit-card-preview{font-size:9px;color:#78909c;margin-top:3px;font-family:var(--mono);}
 
 /* ── Sinistres ── */
-.sin-pane{flex:1;overflow-y:auto;padding:14px;}
+.sin-pane{flex:1;overflow-y:auto;}
 .sin-risk-row{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:0 0 10px;}
 .sin-risk-card{border-radius:8px;padding:8px 6px;text-align:center;border:1px solid rgba(0,0,0,.06);}
 .sin-risk-val{font-size:14px;font-weight:800;color:#37474f;}
@@ -343,10 +354,11 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 @media(max-width:768px){
   .logo-wordmark{display:none;}
   .hdr-search{max-width:calc(100vw - 140px);}
-  .sheet{width:100vw;max-width:100vw;}
-  
+  .sheet{width:100vw;max-width:100vw;top:52px;}
   .gp-btn{width:44px;height:44px;}
-  .sh-tab-icon{display:none;}
+  .sh-tab-icon{font-size:12px;}
+  .sh-tab{font-size:8px;padding:7px 2px 6px;}
+  .sh-back-bar{font-size:12px;padding:10px 14px;}
 }
 @media(max-width:480px){
   .ndvi-stats-row{grid-template-columns:1fr 1fr;}
@@ -540,18 +552,15 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
   min-height:200px;
 }
 
-/* ── Fiche parcelle : sh-pane.on scroll ── */
-.sh-pane.on{
-  display:flex;
-  flex-direction:column;
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-}
-/* pane NDVI : pas de scroll propre (les cartes Leaflet gèrent) */
-#pane-ndvi{
-  overflow-y:auto;
-}
+/* ── sh-pane active ── */
+.sh-pane.on{display:flex;flex-direction:column;flex:1;min-height:0;}
+
+/* Panes avec scroll interne */
+#pane-ndvi{overflow-y:auto;}
+#pane-expert .expert-pane{overflow-y:auto;flex:1;}
+#pane-sin .sin-pane{overflow-y:auto;flex:1;}
+#pane-wx .wx-pane{overflow-y:auto;flex:1;}
+#pane-info .info-pane{overflow-y:auto;flex:1;}
 
 /* ── Panneau GP — règle complète ── */
 .gp-panel{
@@ -794,8 +803,11 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .sin-detail.open .sin-chevron{transform:rotate(180deg);}
 .sin-detail-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 
-/* ── Sin-pane : ajustement marges pour le header risque full-width ── */
-.sin-pane>div:first-child{margin-left:-14px;margin-right:-14px;margin-top:-14px;}
+/* ── Sin-pane : header risque full-width sans hack ── */
+.sin-pane{padding:0;}
+.sin-pane>*:not(:first-child){padding-left:14px;padding-right:14px;}
+.sin-risk-row{padding:10px 14px;}
+.sin-detail{margin:0 14px 8px;}
 
 /* ── Météo : wx-gauge-bar corrections ── */
 .wx-gauge-bar-wrap{position:relative;}
@@ -982,22 +994,27 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 
     <!-- Fiche parcelle -->
   <div class="sheet" id="sheet">
-    <div class="sh-handle"></div>
+    <!-- Bouton retour carte — toujours visible -->
+    <button class="sh-back-bar" onclick="closeSheet()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      Retour à la carte
+    </button>
     <div class="sh-hdr" id="shHdrEl" style="background:#2e7d32;">
       <div class="sh-hdr-bg"></div>
       <div class="sh-hdr-inner" id="shHdrInner">
         <div class="sh-top">
-          <div>
+          <div style="flex:1;min-width:0;">
             <div class="sh-commune" id="shTitle">Parcelle</div>
             <div class="sh-coords" id="shCoords">—</div>
           </div>
-          <button class="sh-close" onclick="closeSheet()">✕</button>
+          <button class="sh-close" onclick="closeSheet()" title="Fermer">✕</button>
         </div>
         <div class="sh-culture-pill" id="cpill">—</div>
       </div>
     </div>
     <div class="sh-body" id="shBody">
-      <div style="text-align:center;padding:30px;color:var(--t2);font-size:11px;">
+      <div style="text-align:center;padding:40px 20px;color:#90a4ae;font-size:11px;">
+        <div style="font-size:28px;margin-bottom:10px;">🗺</div>
         Cliquez sur une parcelle pour afficher les détails
       </div>
     </div>
