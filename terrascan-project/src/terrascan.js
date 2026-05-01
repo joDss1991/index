@@ -2821,12 +2821,26 @@ function buildWxToday(m){
   const rain=d.precipitation_sum[idx]||0;
   const wind=d.windspeed_10m_max?d.windspeed_10m_max[idx]:null;
   const gusts=d.windgusts_10m_max?d.windgusts_10m_max[idx]:null;
-  // Pluie 7 derniers jours PASSÉS (past uniquement)
+  const etp=d.et0_fao_evapotranspiration?d.et0_fao_evapotranspiration[idx]:null;
+  // Pluie 7 derniers jours PASSÉS
   const rain7=d.precipitation_sum.slice(Math.max(0,idx-6),idx+1).reduce((a,b)=>a+(b||0),0);
+  const etp7=d.et0_fao_evapotranspiration?d.et0_fao_evapotranspiration.slice(Math.max(0,idx-6),idx+1).reduce((a,b)=>a+(b||0),0):null;
   const wcode=d.weathercode?d.weathercode[idx]:null;
   const icon=wxIcon(wcode);
-  return '<div class="wx-today-section">'
-    +'<div class="wx-section-title">Dernière journée disponible'
+  // Bilan hydrique 7j
+  const bilan7=etp7!=null?(rain7-etp7).toFixed(0):null;
+  const bilanColor=bilan7!=null?(parseFloat(bilan7)>0?'#1976d2':parseFloat(bilan7)<-20?'#c62828':'#e65100'):'#90a4ae';
+  // Conditions actuelles (current_weather si dispo)
+  const cw=m.current_weather;
+  const cwHtml=cw?'<div class="wx-current-bar">'
+    +'<span class="wx-current-icon">'+wxIcon(cw.weathercode)+'</span>'
+    +'<span class="wx-current-temp">'+cw.temperature.toFixed(1)+'°C</span>'
+    +'<span class="wx-current-wind">💨 '+cw.windspeed.toFixed(0)+' km/h</span>'
+    +'<span class="wx-current-lbl">Conditions actuelles</span>'
+    +'</div>':'';
+  return cwHtml
+    +'<div class="wx-today-section">'
+    +'<div class="wx-section-title">Dernière journée complète'
     +'<span class="wx-section-date">'+jourNom+' '+dateLabel+'</span>'
     +'<span class="wx-section-icon">'+icon+'</span>'
     +'</div>'
@@ -2840,18 +2854,26 @@ function buildWxToday(m){
     +'<div class="wx-today-cell">'
       +'<div class="wx-today-icon">🌧</div>'
       +'<div class="wx-today-val">'+rain.toFixed(1)+'<span style="font-size:9px">mm</span></div>'
+      +'<div class="wx-today-sub">7j : '+rain7.toFixed(0)+' mm</div>'
       +'<div class="wx-today-lbl">Précip</div>'
     +'</div>'
     +'<div class="wx-today-cell">'
       +'<div class="wx-today-icon">💨</div>'
       +'<div class="wx-today-val">'+(wind?wind.toFixed(0):'—')+'<span style="font-size:9px">km/h</span></div>'
       +(gusts?'<div class="wx-today-sub">rafale '+gusts.toFixed(0)+'</div>':'')
-      +'<div class="wx-today-lbl">Vent</div>'
+      +'<div class="wx-today-lbl">Vent max</div>'
+    +'</div>'
+    +'<div class="wx-today-cell">'
+      +'<div class="wx-today-icon">🌿</div>'
+      +'<div class="wx-today-val">'+(etp!=null?etp.toFixed(1):'—')+'<span style="font-size:9px">mm</span></div>'
+      +(etp7!=null?'<div class="wx-today-sub">7j : '+etp7.toFixed(0)+' mm</div>':'')
+      +'<div class="wx-today-lbl">ETP (FAO)</div>'
     +'</div>'
     +'<div class="wx-today-cell">'
       +'<div class="wx-today-icon">💧</div>'
-      +'<div class="wx-today-val">'+rain7.toFixed(0)+'<span style="font-size:9px">mm</span></div>'
-      +'<div class="wx-today-lbl">Pluie 7j</div>'
+      +'<div class="wx-today-val" style="color:'+bilanColor+'">'+(bilan7!=null?(parseFloat(bilan7)>0?'+':'')+bilan7:'—')+'<span style="font-size:9px">mm</span></div>'
+      +'<div class="wx-today-sub">Pluie − ETP 7j</div>'
+      +'<div class="wx-today-lbl">Bilan hydrique</div>'
     +'</div>'
     +'</div>'
     +'</div>';
@@ -3440,10 +3462,18 @@ async function openSheet(lat,lng){
       fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lng+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,windgusts_10m_max,weathercode,et0_fao_evapotranspiration&current_weather=true&past_days=30&forecast_days=7&timezone=Europe/Paris').then(r=>r.json())
     ]);
 
-    let commune='—';
+    let commune='—', communeCP='—';
     if(geo.status==='fulfilled'&&geo.value?.address){
       const a=geo.value.address;
-      commune=a.village||a.town||a.city||a.municipality||a.county||'—';
+      const nom=a.village||a.hamlet||a.town||a.city||a.municipality||a.county||'—';
+      const cp=a.postcode||'';
+      const dept=a.county||a.state_district||'';
+      commune=nom;
+      communeCP=cp?nom+' ('+cp+')':nom;
+      // Afficher département dans la barre coords
+      const coordsExtra=dept&&dept!==nom?' · '+dept:'';
+      document.getElementById('shCoords').textContent=
+        lat.toFixed(5)+'°N, '+lng.toFixed(5)+'°E'+coordsExtra;
     }
 
     let rpgFeats=[];
@@ -3544,7 +3574,7 @@ async function openSheet(lat,lng){
 
     const shHdrEl=document.getElementById('shHdrEl');
     if(shHdrEl) shHdrEl.style.background=coulCult;
-    document.getElementById('shTitle').textContent=commune;
+    document.getElementById('shTitle').textContent=communeCP!=='—'?communeCP:commune;
     document.getElementById('shCoords').textContent=lat.toFixed(5)+', '+lng.toFixed(5);
     document.getElementById('cpill').textContent=culture+(codeRpg?' · '+codeRpg:'')+(surface?' · '+parseFloat(surface).toFixed(2)+' ha':'');
 
