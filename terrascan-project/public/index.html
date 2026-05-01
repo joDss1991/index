@@ -317,6 +317,7 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 
 /* ── Splash ── */
 #splash{position:fixed;inset:0;z-index:9000;background:#0a1a10;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#splash.hidden{display:none!important;}
 .splash-logo{display:flex;align-items:center;gap:14px;}
 .splash-title{font-size:32px;font-weight:900;color:white;letter-spacing:3px;}
 .splash-bar-wrap{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
@@ -692,6 +693,78 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
   width:100% !important;
   height:100% !important;
 }
+
+/* ══════════════════════════════════════
+   CLASSES MANQUANTES — AUDIT v6.2
+   ══════════════════════════════════════ */
+
+/* ── Sinistres ── */
+.sin-row{display:flex;justify-content:space-between;align-items:center;padding:4px 14px;font-size:10px;}
+.sin-row-k{color:#90a4ae;font-family:var(--mono);}
+.sin-row-v{font-weight:600;color:#37474f;}
+.sin-tl{padding:0 14px 10px;}
+.sin-tl-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;}
+.sin-tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.sin-bar{height:6px;background:#e9ecef;border-radius:3px;margin:4px 0;overflow:hidden;}
+.sin-detail-ic{font-size:16px;flex-shrink:0;}
+.sin-detail-name{font-size:11px;font-weight:600;color:#37474f;}
+.sin-chevron{font-size:12px;color:#b0bec5;transition:transform .2s;}
+.sin-risk-icon{font-size:16px;margin-bottom:2px;}
+
+/* ── Météo gauges ── */
+.wx-today-val{font-size:18px;font-weight:800;color:#37474f;line-height:1;}
+.wx-today-sub{font-size:9px;color:#90a4ae;font-family:var(--mono);}
+.wx-today-lbl{font-size:8px;color:#b0bec5;font-family:var(--mono);margin-top:2px;}
+.wx-section-date{font-size:10px;font-weight:700;color:#37474f;}
+.wx-section-icon{font-size:16px;}
+.wx-gauge-item{display:flex;align-items:center;gap:8px;padding:5px 12px;border-bottom:1px solid #f5f5f5;}
+.wx-gauge-top{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.wx-gauge-label{font-size:9px;color:#90a4ae;font-family:var(--mono);flex:1;}
+.wx-gauge-icon{font-size:14px;flex-shrink:0;}
+.wx-gauge-right{text-align:right;flex-shrink:0;}
+.wx-gauge-unit{font-size:8px;color:#b0bec5;font-family:var(--mono);}
+.wx-gauge-delta{font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;display:inline-block;}
+.wx-gauge-delta.above{color:#e53935;background:rgba(229,57,53,.1);}
+.wx-gauge-delta.below{color:#1e88e5;background:rgba(30,136,229,.1);}
+.wx-gauge-delta.normal{color:#43a047;background:rgba(67,160,71,.1);}
+.wx-gauge-bar-row{display:flex;align-items:center;gap:4px;}
+.wx-gauge-norm-mark{position:absolute;top:0;bottom:0;width:2px;background:#90a4ae;border-radius:1px;}
+.wx-gauge-bar-labels{display:flex;justify-content:space-between;margin-top:2px;}
+.wx-gauge-norm-lbl{font-size:7px;color:#b0bec5;font-family:var(--mono);}
+.wx-gauge-norm-val{font-size:7px;color:#90a4ae;font-family:var(--mono);}
+.wx-compare-title{font-size:9px;font-weight:700;color:#37474f;padding:8px 12px 4px;text-transform:uppercase;letter-spacing:.5px;}
+.wx-compare-period{font-size:8px;color:#90a4ae;font-family:var(--mono);}
+.wx-clim-wrap{padding:4px 12px 8px;}
+.wx-clim-title{font-size:9px;font-weight:700;color:#37474f;margin-bottom:6px;}
+.wx-clim-icon{font-size:16px;}
+.wx-clim-sub{font-size:8px;color:#90a4ae;font-family:var(--mono);}
+.wx-clim-unit{font-size:7px;color:#b0bec5;font-family:var(--mono);}
+
+/* ── Infos parcelle ── */
+.info-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid #f0f0f0;gap:8px;}
+.info-key{font-size:10px;color:#90a4ae;font-family:var(--mono);flex-shrink:0;}
+.info-val{font-size:11px;font-weight:600;color:#37474f;text-align:right;}
+.info-note{font-size:8px;color:#b0bec5;font-family:var(--mono);margin-top:10px;padding-top:8px;border-top:1px solid #f0f0f0;}
+
+/* ── GPS éléments graphiques ── */
+.gps-info-btn{padding:5px 12px;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;border:1px solid rgba(45,189,138,.3);background:rgba(45,189,138,.1);color:var(--accent);font-family:var(--mono);transition:all .12s;width:100%;margin-top:4px;}
+.gps-info-btn:hover{background:rgba(45,189,138,.2);}
+.gps-dot-wrap{position:relative;width:22px;height:22px;}
+.gps-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(21,101,192,.4);animation:gps-pulse 1.5s ease-out infinite;}
+@keyframes gps-pulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.2);opacity:0}}
+.gps-dot.heading{border-radius:50% 50% 50% 0;transform:rotate(-45deg);}
+.gps-heading-arrow{position:absolute;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:10px solid #1565C0;top:-12px;left:50%;transform-origin:bottom center;}
+
+/* ── CatNat popups ── */
+.catnat-popup{font-family:var(--mono);min-width:180px;}
+.catnat-popup-title{font-size:11px;font-weight:700;color:#b71c1c;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #f0f0f0;}
+.catnat-popup-row{display:flex;gap:6px;margin-bottom:3px;}
+.catnat-popup-key{font-size:9px;color:#90a4ae;width:80px;flex-shrink:0;}
+.catnat-popup-val{font-size:9px;color:#37474f;font-weight:600;}
+.catnat-badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;background:rgba(183,28,28,.1);color:#b71c1c;font-family:var(--mono);}
+.catnat-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(45,189,138,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+.catnat-loading{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--text-muted);font-family:var(--mono);padding:6px 12px;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 </style>
 <body>
@@ -1732,6 +1805,7 @@ const GIBS    = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_
 let tok=null, tokExp=0, dates=[], curIdx=0, maxCC=60;
 let ndviLyr=null, s2Lyr=null, ndviOpen=false, curBase='esri';
 let wxChart=null, ovState={cad:false,pac:false,sar:false,relief:false,grele:false,pedol:false,hydro:false,aoc:false}, datesMeta={};
+let _reliefLyr=null, _contourLyr=null;
 
 
 
@@ -3087,35 +3161,13 @@ function copyShareUrl(){
 }
 
 map.whenReady(()=>{
-  // Init badge export
   const _store=loadStore();
   const _nb=Object.values(_store).filter(p=>(p.visits&&p.visits.length>0)||p.comment).length;
   const _btn=document.getElementById('btnExportPdf');
   if(_btn&&_nb>0) _btn.setAttribute('data-count',_nb);
+  setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},500);
 });
-map.whenReady(()=>setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},500));
 setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},4000);
-map.whenReady(()=>{
-  // Init badge export
-  const _store=loadStore();
-  const _nb=Object.values(_store).filter(p=>(p.visits&&p.visits.length>0)||p.comment).length;
-  const _btn=document.getElementById('btnExportPdf');
-  if(_btn&&_nb>0) _btn.setAttribute('data-count',_nb);
-});
-map.whenReady(()=>setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},500));
-setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},4000);
-// Masquer le splash dès que la carte est prête
-map.whenReady(()=>{
-  setTimeout(()=>{
-    const sp=document.getElementById('splash');
-    if(sp&&!sp.classList.contains('hidden')) sp.classList.add('hidden');
-  },500);
-});
-// Fallback absolu : masquer après 4s quoi qu'il arrive
-setTimeout(()=>{
-  const sp=document.getElementById('splash');
-  if(sp) sp.classList.add('hidden');
-},4000);
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.control.scale({metric:true,imperial:false,position:'bottomleft'}).addTo(map);
 
@@ -3506,7 +3558,15 @@ map.on('moveend',()=>{
 });
 
 // ── SAR Humidité ──
-const SAR_EVALSCRIPT=`//VERSION=3`;
+const SAR_EVALSCRIPT=`//VERSION=3
+function setup(){return{input:[{bands:["VV","VH"],units:"LINEAR_POWER"}],output:{bands:3}};}
+function evaluatePixel(s){
+  const vv=Math.sqrt(s.VV),vh=Math.sqrt(s.VH);
+  const r=Math.min(1,vv*2.5);
+  const g=Math.min(1,vh*5.0);
+  const b=Math.min(1,(vv/Math.max(vh,0.0001))/10);
+  return[r,g,b];
+}`;
 
 function buildSarLayer(){
   const TILE_SIZE=512;
@@ -4648,7 +4708,7 @@ function startGPS(){
   // Si déjà actif : toggle le panneau info
   if(wid!==null){
     const p=document.getElementById('gpsPanel');
-    if(p) p.classList.toggle('show');
+    if(p) p.classList.toggle('visible');
     return;
   }
 
@@ -4726,7 +4786,7 @@ function startGPS(){
         _firstFix=false;
         map.flyTo([lat,lng],17,{duration:1.2});
         const panel=document.getElementById('gpsPanel');
-        if(panel) panel.classList.add('show');
+        if(panel) panel.classList.add('visible');
         showToast('📍 Position GPS · ±'+acc.toFixed(0)+'m');
       } else if(_gpsAutoFollow){
         map.setView([lat,lng],map.getZoom(),{animate:true,duration:.4});
@@ -4804,8 +4864,17 @@ function stopGPS(){
   document.querySelector('.gps-pill')?.classList.remove('tracking');
   document.getElementById('gpsTargetBtn')?.classList.remove('tracking');
   const panel=document.getElementById('gpsPanel');
-  if(panel) panel.classList.remove('show');
+  if(panel) panel.classList.remove('visible');
   showToast('Suivi GPS arrêté');
+}
+
+function toggleGpsPanel(){
+  if(wid!==null){
+    const p=document.getElementById('gpsPanel');
+    if(p) p.classList.toggle('visible');
+  } else {
+    startGPS();
+  }
 }
 
 // ── Recherche ──
@@ -4900,7 +4969,7 @@ function distToFeature(lat,lng,feature){
 
 // ── map.on click ──
 map.on('click',e=>{
-  if(mMode) return;
+  if(mMode||_annotMode) return;
   openSheet(e.latlng.lat,e.latlng.lng);
 });
 
@@ -5216,12 +5285,6 @@ async function openSheet(lat,lng){
       initNdviParcelMap(window._currentRpgFeature,lat,lng);
     },80);
     window._ndviParcelLat=lat;window._ndviParcelLng=lng;
-    // Init carte NDVI parcelle avec délai pour que le DOM soit rendu
-    setTimeout(()=>{
-      if(window._ndviParcelLat&&window._ndviParcelLng){
-        initNdviParcelMap(window._currentRpgFeature,window._ndviParcelLat,window._ndviParcelLng);
-      }
-    }, 150);
     // Charger galerie photos
     setTimeout(()=>renderPhotoGallery(lat,lng),200);
 
@@ -5791,7 +5854,8 @@ function drawNdviGraph(wxData){
 
 // ── moveend / auto-refresh ──
 let lastFetch=Date.now();
-map.on('moveend',()=>{fetchDates();lastFetch=Date.now();});
+let _fetchDatesTimer=null;
+map.on('moveend',()=>{clearTimeout(_fetchDatesTimer);_fetchDatesTimer=setTimeout(()=>{fetchDates();lastFetch=Date.now();},1500);});
 setInterval(async()=>{
   if(Date.now()-lastFetch>3600000){
     const old=dates[0];await fetchDates();lastFetch=Date.now();

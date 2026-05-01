@@ -237,6 +237,7 @@ const GIBS    = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_
 let tok=null, tokExp=0, dates=[], curIdx=0, maxCC=60;
 let ndviLyr=null, s2Lyr=null, ndviOpen=false, curBase='esri';
 let wxChart=null, ovState={cad:false,pac:false,sar:false,relief:false,grele:false,pedol:false,hydro:false,aoc:false}, datesMeta={};
+let _reliefLyr=null, _contourLyr=null;
 
 
 
@@ -1592,35 +1593,13 @@ function copyShareUrl(){
 }
 
 map.whenReady(()=>{
-  // Init badge export
   const _store=loadStore();
   const _nb=Object.values(_store).filter(p=>(p.visits&&p.visits.length>0)||p.comment).length;
   const _btn=document.getElementById('btnExportPdf');
   if(_btn&&_nb>0) _btn.setAttribute('data-count',_nb);
+  setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},500);
 });
-map.whenReady(()=>setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},500));
 setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},4000);
-map.whenReady(()=>{
-  // Init badge export
-  const _store=loadStore();
-  const _nb=Object.values(_store).filter(p=>(p.visits&&p.visits.length>0)||p.comment).length;
-  const _btn=document.getElementById('btnExportPdf');
-  if(_btn&&_nb>0) _btn.setAttribute('data-count',_nb);
-});
-map.whenReady(()=>setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},500));
-setTimeout(()=>{const sp=document.getElementById('splash');if(sp)sp.classList.add('hidden');},4000);
-// Masquer le splash dès que la carte est prête
-map.whenReady(()=>{
-  setTimeout(()=>{
-    const sp=document.getElementById('splash');
-    if(sp&&!sp.classList.contains('hidden')) sp.classList.add('hidden');
-  },500);
-});
-// Fallback absolu : masquer après 4s quoi qu'il arrive
-setTimeout(()=>{
-  const sp=document.getElementById('splash');
-  if(sp) sp.classList.add('hidden');
-},4000);
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.control.scale({metric:true,imperial:false,position:'bottomleft'}).addTo(map);
 
@@ -2011,7 +1990,15 @@ map.on('moveend',()=>{
 });
 
 // ── SAR Humidité ──
-const SAR_EVALSCRIPT=`//VERSION=3`;
+const SAR_EVALSCRIPT=`//VERSION=3
+function setup(){return{input:[{bands:["VV","VH"],units:"LINEAR_POWER"}],output:{bands:3}};}
+function evaluatePixel(s){
+  const vv=Math.sqrt(s.VV),vh=Math.sqrt(s.VH);
+  const r=Math.min(1,vv*2.5);
+  const g=Math.min(1,vh*5.0);
+  const b=Math.min(1,(vv/Math.max(vh,0.0001))/10);
+  return[r,g,b];
+}`;
 
 function buildSarLayer(){
   const TILE_SIZE=512;
@@ -3153,7 +3140,7 @@ function startGPS(){
   // Si déjà actif : toggle le panneau info
   if(wid!==null){
     const p=document.getElementById('gpsPanel');
-    if(p) p.classList.toggle('show');
+    if(p) p.classList.toggle('visible');
     return;
   }
 
@@ -3231,7 +3218,7 @@ function startGPS(){
         _firstFix=false;
         map.flyTo([lat,lng],17,{duration:1.2});
         const panel=document.getElementById('gpsPanel');
-        if(panel) panel.classList.add('show');
+        if(panel) panel.classList.add('visible');
         showToast('📍 Position GPS · ±'+acc.toFixed(0)+'m');
       } else if(_gpsAutoFollow){
         map.setView([lat,lng],map.getZoom(),{animate:true,duration:.4});
@@ -3309,8 +3296,17 @@ function stopGPS(){
   document.querySelector('.gps-pill')?.classList.remove('tracking');
   document.getElementById('gpsTargetBtn')?.classList.remove('tracking');
   const panel=document.getElementById('gpsPanel');
-  if(panel) panel.classList.remove('show');
+  if(panel) panel.classList.remove('visible');
   showToast('Suivi GPS arrêté');
+}
+
+function toggleGpsPanel(){
+  if(wid!==null){
+    const p=document.getElementById('gpsPanel');
+    if(p) p.classList.toggle('visible');
+  } else {
+    startGPS();
+  }
 }
 
 // ── Recherche ──
@@ -3405,7 +3401,7 @@ function distToFeature(lat,lng,feature){
 
 // ── map.on click ──
 map.on('click',e=>{
-  if(mMode) return;
+  if(mMode||_annotMode) return;
   openSheet(e.latlng.lat,e.latlng.lng);
 });
 
@@ -3721,12 +3717,6 @@ async function openSheet(lat,lng){
       initNdviParcelMap(window._currentRpgFeature,lat,lng);
     },80);
     window._ndviParcelLat=lat;window._ndviParcelLng=lng;
-    // Init carte NDVI parcelle avec délai pour que le DOM soit rendu
-    setTimeout(()=>{
-      if(window._ndviParcelLat&&window._ndviParcelLng){
-        initNdviParcelMap(window._currentRpgFeature,window._ndviParcelLat,window._ndviParcelLng);
-      }
-    }, 150);
     // Charger galerie photos
     setTimeout(()=>renderPhotoGallery(lat,lng),200);
 
@@ -4296,7 +4286,8 @@ function drawNdviGraph(wxData){
 
 // ── moveend / auto-refresh ──
 let lastFetch=Date.now();
-map.on('moveend',()=>{fetchDates();lastFetch=Date.now();});
+let _fetchDatesTimer=null;
+map.on('moveend',()=>{clearTimeout(_fetchDatesTimer);_fetchDatesTimer=setTimeout(()=>{fetchDates();lastFetch=Date.now();},1500);});
 setInterval(async()=>{
   if(Date.now()-lastFetch>3600000){
     const old=dates[0];await fetchDates();lastFetch=Date.now();
