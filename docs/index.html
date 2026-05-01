@@ -5480,8 +5480,8 @@ function setNdviViewMode(mode, btn){
 }
 
 function initSplitMaps(){
-  if(_splitMapL){try{_splitMapL.remove();}catch(e){} _splitMapL=null;}
-  if(_splitMapR){try{_splitMapR.remove();}catch(e){} _splitMapR=null;}
+  if(_splitMapL){try{_splitMapL.remove();}catch(e){} _splitMapL=null; _splitBaseL=null; _splitLyrL=null; _splitOutlineL=null;}
+  if(_splitMapR){try{_splitMapR.remove();}catch(e){} _splitMapR=null; _splitBaseR=null; _splitLyrR=null; _splitOutlineR=null;}
 
   const elL=document.getElementById('ndviSplitMapLeft');
   const elR=document.getElementById('ndviSplitMapRight');
@@ -5558,10 +5558,12 @@ function initSplitMaps(){
   },500);
 }
 
-function loadSplitNdvi(){
+async function loadSplitNdvi(){
   if(!_splitMapL||!_splitMapR) return;
   if(_splitLyrL){try{_splitMapL.removeLayer(_splitLyrL);}catch(e){} _splitLyrL=null;}
   if(_splitLyrR){try{_splitMapR.removeLayer(_splitLyrR);}catch(e){} _splitLyrR=null;}
+
+  try{ await getToken(); }catch(e){ console.warn('Split NDVI: token error',e.message); }
 
   function makeNdviLayer(d){
     if(!d) return null;
@@ -5814,13 +5816,14 @@ function initNdviParcelMap(rpgFeature,lat,lng){
   setTimeout(updateNdviTimeline,400);
 }
 
-function loadNdviOnParcel(){
+async function loadNdviOnParcel(){
   if(!_ndviParcelMap) return;
   if(_ndviParcelLayer){try{_ndviParcelMap.removeLayer(_ndviParcelLayer);}catch(e){} _ndviParcelLayer=null;}
   const d=dates.length?dates[_parcelIdx]:new Date().toISOString().split('T')[0];
   const dt2=new Date(d+'T12:00:00Z');dt2.setDate(dt2.getDate()+1);
   const dtEnd=dt2.toISOString().split('T')[0];
   if(_ndviParcelMode==='ndvi'){
+    try{ await getToken(); }catch(e){ console.warn('NDVI parcel: token error',e.message); }
     const _parcWmsUrl='https://sh.dataspace.copernicus.eu/ogc/wms/'+SH_INST+(tok?'?access_token='+encodeURIComponent(tok):'');
     _ndviParcelLayer=L.tileLayer.wms(_parcWmsUrl,{
       layers:NDVI_L,format:'image/png',transparent:true,version:'1.3.0',
@@ -6312,14 +6315,10 @@ async function exportPDF(){
 // SCORE NDVI AVANT/APRÈS en %
 // ═══════════════════════════════════════════════════════════════
 function computeNdviScore(){
-  // Utilise les 2 dates du split pour calculer la perte
-  if(!_splitDateL||!_splitDateR||!dates.length) return null;
-  // Les valeurs NDVI moyennes sont dans ndviMoyVal (date courante)
-  // Pour un calcul réel il faudrait l'API Process — on utilise une estimation
   const moyEl = document.getElementById('ndviMoyVal');
   if(!moyEl) return null;
   const curMoy = parseFloat(moyEl.textContent);
-  if(isNaN(curMoy)) return null;
+  if(isNaN(curMoy)||!dates.length) return null;
   // Estimation : comparer avec la normale saisonnière (0.65 pour végétation saine)
   const reference = 0.65;
   const perte = ((reference - curMoy) / reference * 100);
