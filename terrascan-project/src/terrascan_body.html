@@ -1,0 +1,798 @@
+<body>
+
+<div id="authScreen" style="display:none;">
+  <div class="auth-box">
+    <div class="auth-logo">TERRA<span style="color:#2dbd8a">SCAN</span></div>
+    <div class="auth-sub">Expert sinistre agricole</div>
+    <div class="auth-label">Code d'accès</div>
+    <input type="password" class="auth-input" id="authInput" 
+      placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')checkAuth()">
+    <button class="auth-btn" onclick="checkAuth()">Accéder</button>
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-hint">Contactez votre administrateur pour obtenir un code</div>
+  </div>
+</div>
+
+<div id="splash">
+  <div class="splash-logo">
+    <svg width="56" height="56" viewBox="0 0 34 34" fill="none">
+      <polygon points="17,2 30,9.5 30,24.5 17,32 4,24.5 4,9.5" fill="#0d2018" stroke="#2dbd8a" stroke-width="1.2"/>
+      <polygon points="17,6 27,11.8 27,22.2 17,28 7,22.2 7,11.8" fill="none" stroke="#1D9E75" stroke-width="0.6" opacity="0.5"/>
+      <circle cx="17" cy="17" r="4" fill="none" stroke="#2dbd8a" stroke-width="1"/>
+      <circle cx="17" cy="17" r="2" fill="#2dbd8a"/>
+    </svg>
+    <div>
+      <div class="splash-title">TERRA<span style="color:var(--ts-accent)">SCAN</span></div>
+      
+    </div>
+  </div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+  <div class="splash-status" id="splashStatus">Initialisation…</div>
+</div>
+
+
+<div class="hdr">
+  <!-- Logo -->
+  <div class="logo">
+    <div class="logo-ic">
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+        <polygon points="17,2 30,9.5 30,24.5 17,32 4,24.5 4,9.5" fill="#0d2018" stroke="#2dbd8a" stroke-width="1.5"/>
+        <polygon points="17,6 27,11.8 27,22.2 17,28 7,22.2 7,11.8" fill="none" stroke="#1D9E75" stroke-width="1"/>
+        <circle cx="17" cy="17" r="4" fill="none" stroke="#2dbd8a" stroke-width="1"/>
+        <circle cx="17" cy="17" r="2" fill="#2dbd8a"/>
+      </svg>
+    </div>
+    <div class="logo-wordmark">
+      <span class="logo-terra">TERRA</span>
+      <span class="logo-scan">SCAN</span>
+    </div>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="hdr-search">
+    <div class="srch">
+      <input id="sInp" type="text" placeholder="Chercher un lieu, une adresse…"
+        onkeydown="if(event.key==='Enter')doSearch()">
+      <button onclick="doSearch()" class="srch-btn"><i class="fas fa-search"></i></button>
+    </div>
+  </div>
+
+  <!-- Actions header -->
+  <div class="hdr-actions">
+    <!-- Dossiers / Historique -->
+    <button class="hdr-btn" id="btnDossiers" onclick="openDashboard()" title="Dossiers & Historique">
+      <i class="fas fa-folder-open" style="font-size:14px;"></i>
+    </button>
+    <!-- Remonter le temps IGN -->
+    <button class="hdr-btn" id="btnHisto" onclick="toggleHistoPanel()" title="Photos historiques IGN">
+      <i class="fas fa-history" style="font-size:14px;"></i>
+    </button>
+    <!-- IA Anomalies NDVI -->
+    <button class="hdr-btn" id="btnIA" onclick="detectAnomalies()" title="Détecter anomalies NDVI">
+      <i class="fas fa-search-location" style="font-size:13px;"></i>
+    </button>
+    <!-- Partager -->
+    <button class="hdr-btn" onclick="copyShareUrl()" title="Copier le lien">
+      <i class="fas fa-share-alt" style="font-size:14px;"></i>
+    </button>
+    <!-- Export rapport -->
+    <button class="hdr-btn accent" id="btnExportPdf" onclick="openExportMenu()" title="Exporter / Rapport">
+      <i class="fas fa-file-export" style="font-size:14px;"></i>
+    </button>
+  </div>
+
+  <div id="gdot" style="display:none;"></div>
+  <span id="glbl" style="display:none;"></span>
+</div>
+
+<div class="map-wrap" id="mapWrap">
+  <div class="map-zone" id="mapZone">
+    <div id="map"></div>
+
+    <!-- GPS info panel -->
+  <div class="gps-info-panel" id="gpsPanel">
+    <div class="gps-info-row">
+      <span class="gps-info-key">Latitude</span>
+      <span class="gps-info-val" id="gpsLat">—</span>
+    </div>
+    <div class="gps-info-row">
+      <span class="gps-info-key">Longitude</span>
+      <span class="gps-info-val" id="gpsLng">—</span>
+    </div>
+    <div class="gps-info-row">
+      <span class="gps-info-key">Précision</span>
+      <span class="gps-info-val" id="gpsAcc">—</span>
+    </div>
+    <div class="gps-info-row">
+      <span class="gps-info-key">Vitesse</span>
+      <span class="gps-info-val" id="gpsSpd">—</span>
+    </div>
+    <div class="gps-info-row">
+      <span class="gps-info-key">Cap</span>
+      <span class="gps-info-val" id="gpsHdg">—</span>
+    </div>
+    <button class="gps-info-btn" id="gpsCenterBtn" onclick="gpsCenterOnMe()">
+      <i class="fas fa-crosshairs"></i> Centrer sur ma position
+    </button>
+    <button class="gps-info-btn stop" onclick="stopGPS()">
+      <i class="fas fa-stop-circle"></i> Arrêter le suivi
+    </button>
+  </div>
+
+  <!-- BADGE DATE SATELLITE — s'adapte à la position des panneaux -->
+  <div id="satDateBadge" style="
+    display:none;position:absolute;
+    bottom:28px;left:50%;transform:translateX(-50%);
+    z-index:400;background:rgba(0,0,0,0.72);color:white;
+    padding:5px 14px;border-radius:20px;font-size:10px;
+    font-family:'DM Mono',monospace;backdrop-filter:blur(4px);
+    pointer-events:none;white-space:nowrap;
+    transition:left .3s,right .3s;
+  ">📡 <span id="satDateTxt">—</span></div>
+
+  <div class="loader" id="loader"><div class="lbox"><div class="spin"></div><div style="font-size:11px;" id="ltxt">Chargement…</div></div></div>
+
+  <!-- Backdrop uniquement mobile -->
+  <div class="backdrop" id="bkdrop"></div>
+
+  <!-- PANNEAU COUCHES — slide depuis la droite -->
+  
+
+  
+
+<!-- Bouton comparer NDVI dans le header -->
+
+    <!-- Fiche parcelle -->
+  <div class="sheet" id="sheet">
+    <div class="sh-handle"></div>
+    <div class="sh-hdr" id="shHdrEl" style="background:#2e7d32;">
+      <div class="sh-hdr-bg"></div>
+      <div class="sh-hdr-inner" id="shHdrInner">
+        <div class="sh-top">
+          <div>
+            <div class="sh-commune" id="shTitle">Parcelle</div>
+            <div class="sh-coords" id="shCoords">—</div>
+          </div>
+          <button class="sh-close" onclick="closeSheet()">✕</button>
+        </div>
+        <div class="sh-culture-pill" id="cpill">—</div>
+      </div>
+    </div>
+    <div class="sh-body" id="shBody">
+      <div style="text-align:center;padding:30px;color:var(--t2);font-size:11px;">
+        Cliquez sur une parcelle pour afficher les détails
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- ═══ BOUTONS FLOTTANTS style Géoportail ═══ -->
+
+    <!-- Toolbar -->
+  <div class="gp-toolbar">
+    <button class="gp-btn" id="gpBtnCartes" onclick="toggleGpPanel('cartes')" title="Fonds de carte">
+      <i class="fas fa-map"></i>
+      <span class="gp-btn-lbl">Cartes</span>
+    </button>
+    <button class="gp-btn" id="gpBtnCouches" onclick="toggleGpPanel('couches')" title="Couches">
+      <i class="fas fa-layer-group"></i>
+      <span class="gp-badge" id="gpBadge" style="display:none;"></span>
+      <span class="gp-btn-lbl">Couches</span>
+    </button>
+    <button class="gp-btn" id="gpBtnOutils" onclick="toggleGpPanel('outils')" title="Outils terrain">
+      <i class="fas fa-ruler-combined"></i>
+      <span class="gp-btn-lbl">Outils</span>
+    </button>
+    <button class="gp-btn" id="gpBtnInfos" onclick="toggleGpPanel('infos')" title="À propos">
+      <i class="fas fa-info"></i>
+      <span class="gp-btn-lbl">Infos</span>
+    </button>
+    <!-- Zoom -->
+    <div class="gp-zoom">
+      <button class="gp-zoom-btn" onclick="map.zoomIn()"><i class="fas fa-plus"></i></button>
+      <button class="gp-zoom-btn" onclick="map.zoomOut()"><i class="fas fa-minus"></i></button>
+    </div>
+    <!-- GPS -->
+    <button class="gp-btn" id="gpBtnGps" onclick="toggleGpsPanel()" title="Ma position">
+      <i class="fas fa-location-arrow"></i>
+      <span class="gp-btn-lbl">GPS</span>
+    </button>
+  </div>
+
+    <!-- Panneau Cartes -->
+  <div class="gp-panel" id="gpPanelCartes">
+    <div class="gp-panel-hdr"><span>Fonds de carte</span><button onclick="closeGpPanel('cartes')" class="gp-panel-close">✕</button></div>
+    <div class="gp-panel-body">
+      <div class="gp-bases-grid">
+        <div class="gp-base-card on" onclick="setBase('ign')" id="base-ign">
+          <div class="gp-base-thumb gp-thumb-ign"></div>
+          <div class="gp-base-info">
+            <div class="gp-base-name">Photographies aériennes</div>
+            <div class="gp-base-sub">IGN · 20 cm · France</div>
+            <div class="gp-base-date" id="dt-ign">Millésime 2022-2024</div>
+          </div>
+          <div class="gp-radio" id="ck-ign"></div>
+        </div>
+        <div class="gp-base-card" onclick="setBase('ignplan')" id="base-ignplan">
+          <div class="gp-base-thumb gp-thumb-ignplan"></div>
+          <div class="gp-base-info">
+            <div class="gp-base-name">Plan IGN</div>
+            <div class="gp-base-sub">IGN · Plan v2 · France</div>
+            <div class="gp-base-date" id="dt-ignplan">Mise à jour continue</div>
+          </div>
+          <div class="gp-radio" id="ck-ignplan"></div>
+        </div>
+        <div class="gp-base-card" onclick="setBase('esri')" id="base-esri">
+          <div class="gp-base-thumb gp-thumb-esri"></div>
+          <div class="gp-base-info">
+            <div class="gp-base-name">Satellite HD</div>
+            <div class="gp-base-sub">ESRI · Maxar · 0.3 m</div>
+            <div class="gp-base-date" id="dt-esri">—</div>
+          </div>
+          <div class="gp-radio" id="ck-esri"></div>
+        </div>
+        <div class="gp-base-card" onclick="setBase('esri2')" id="base-esri2">
+          <div class="gp-base-thumb gp-thumb-esri2"></div>
+          <div class="gp-base-info">
+            <div class="gp-base-name">Satellite ultra HD</div>
+            <div class="gp-base-sub">ESRI Clarity · zoom ×20</div>
+            <div class="gp-base-date" id="dt-esri2">—</div>
+          </div>
+          <div class="gp-radio" id="ck-esri2"></div>
+        </div>
+        <div class="gp-base-card" onclick="setBase('s2')" id="base-s2">
+          <div class="gp-base-thumb gp-thumb-s2"></div>
+          <div class="gp-base-info">
+            <div class="gp-base-name">Sentinel-2 récent</div>
+            <div class="gp-base-sub">ESA/Copernicus · 10 m</div>
+            <div class="gp-base-date" id="dt-s2">Date NDVI</div>
+          </div>
+          <div class="gp-radio" id="ck-s2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANNEAU COUCHES -->
+
+    <!-- Panneau Couches -->
+  <div class="gp-panel" id="gpPanelCouches">
+    <div class="gp-panel-hdr"><span>Couches superposées</span><button onclick="closeGpPanel('couches')" class="gp-panel-close">✕</button></div>
+    <div class="gp-panel-body">
+      <div class="gp-ov-item" id="ov-ndvi">
+        <div class="gp-ov-thumb" style="background:linear-gradient(90deg,#8B1A00,#FA8C16,#52C41A);"></div>
+        <div class="gp-ov-info"><div class="gp-ov-name">NDVI végétation</div><div class="gp-ov-sub">Sentinel-2 · ESA · 10m</div></div>
+        <div class="gp-ov-toggle" id="tk-ndvi" onclick="toggleNdviLayer()"><div class="tk-knob"></div></div>
+      </div>
+      <div class="gp-ov-detail" id="det-ndvi">
+        <div class="gp-ov-src">Heatmap rouge→vert · Sentinel-2 L2A · ESA/Copernicus</div>
+        <div class="gp-op-row"><span class="gp-op-lbl">Opacité</span><input type="range" class="op-slider" min="0" max="100" value="88" oninput="setOpacity('ndvi',this.value)" onclick="event.stopPropagation()"><span class="op-val" id="op-ndvi">88%</span></div>
+      </div>
+      <div class="gp-ov-item" id="ov-cad">
+        <div class="gp-ov-thumb" style="background:repeating-linear-gradient(45deg,#e67e22,#e67e22 2px,transparent 2px,transparent 8px);"></div>
+        <div class="gp-ov-info"><div class="gp-ov-name">Cadastre</div><div class="gp-ov-sub">IGN · Parcelles cadastrales</div></div>
+        <div class="gp-ov-toggle" id="tk-cad" onclick="togOv('cad')"><div class="tk-knob"></div></div>
+      </div>
+      <div class="gp-ov-detail" id="det-cad">
+        <div class="gp-ov-src">IGN · Limites parcellaires · Zoom ×14 minimum</div>
+        <div class="gp-op-row"><span class="gp-op-lbl">Opacité</span><input type="range" class="op-slider" min="0" max="100" value="75" oninput="setOpacity('cad',this.value)" onclick="event.stopPropagation()"><span class="op-val" id="op-cad">75%</span></div>
+      </div>
+      <div class="gp-ov-item" id="ov-pac">
+        <div class="gp-ov-thumb" style="background:linear-gradient(90deg,#2e7d32,#66bb6a,#a5d6a7);"></div>
+        <div class="gp-ov-info"><div class="gp-ov-name">PAC / RPG</div><div class="gp-ov-sub">IGN/ASP · Campagne 2023</div></div>
+        <div class="gp-ov-toggle" id="tk-pac" onclick="togOv('pac')"><div class="tk-knob"></div></div>
+      </div>
+      <div class="gp-ov-detail" id="det-pac">
+        <div class="gp-ov-src">IGN/ASP · Registre Parcellaire Graphique · Campagne PAC 2023</div>
+        <div class="gp-op-row"><span class="gp-op-lbl">Opacité</span><input type="range" class="op-slider" min="0" max="100" value="55" oninput="setOpacity('pac',this.value)" onclick="event.stopPropagation()"><span class="op-val" id="op-pac">55%</span></div>
+      </div>
+            <!-- HUMIDITÉ DES SOLS SAR -->
+      <div class="gp-ov-item" id="ov-sar">
+        <div class="gp-ov-thumb" style="background:linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff);"></div>
+        <div class="gp-ov-info"><div class="gp-ov-name">Humidité des sols</div><div class="gp-ov-sub">Sentinel-1 SAR · Radar 10m</div></div>
+        <div class="gp-ov-toggle" id="tk-sar" onclick="togOv('sar')"><div class="tk-knob"></div></div>
+      </div>
+      <div class="gp-ov-detail" id="det-sar">
+        <div class="gp-ov-src">Sentinel-1 SAR · ESA · <span id="sarDateLabel" style="color:var(--gd);">Période : —</span></div>
+        <div style="display:flex;align-items:center;gap:6px;margin:4px 0 6px;"><span style="font-size:8px;color:#90a4ae;">Sec</span><div style="flex:1;height:4px;border-radius:2px;background:linear-gradient(to right,#ff6b6b,#ffd93d,#6bcb77,#4d96ff);"></div><span style="font-size:8px;color:#90a4ae;">Humide</span></div>
+        <div class="gp-op-row"><span class="gp-op-lbl">Opacité</span><input type="range" class="op-slider" min="0" max="100" value="75" oninput="setOpacity('sar',this.value)" onclick="event.stopPropagation()"><span class="op-val" id="op-sar">75%</span></div>
+      </div>
+      <!-- CATNAT & RISQUES -->
+      <div class="gp-ov-item" id="ov-catnat">
+        <div class="gp-ov-thumb" style="background:linear-gradient(90deg,#ffcdd2,#ef9a9a,#e53935);"></div>
+        <div class="gp-ov-info">
+          <div class="gp-ov-name">CatNat &amp; Risques</div>
+          <div class="gp-ov-sub">Georisques.gouv.fr · Officiel</div>
+        </div>
+        <div class="gp-ov-toggle" id="tk-catnat" onclick="togCatnat()"><div class="tk-knob"></div></div>
+      </div>
+
+      <!-- RELIEF IGN -->
+      <div class="gp-ov-item" id="ov-relief">
+        <div class="gp-ov-thumb" style="background:linear-gradient(135deg,#1a3a5c 0%,#2e6b8a 40%,#52a878 70%,#d4c87a 85%,#c0392b 100%);"></div>
+        <div class="gp-ov-info">
+          <div class="gp-ov-name">Relief &amp; Altitude</div>
+          <div class="gp-ov-sub">IGN Géoplateforme · MNT + courbes</div>
+        </div>
+        <div class="gp-ov-toggle" id="tk-relief" onclick="togRelief()"><div class="tk-knob"></div></div>
+      </div>
+      <div class="gp-ov-detail" id="detail-relief">
+        <div class="gp-ov-src">Ombrage relief + courbes de niveau IGN<br>
+        Utile pour : zones de gel en creux, exposition versant</div>
+      </div>
+
+      <!-- RADAR GRÊLE -->
+      <div class="gp-ov-item" id="ov-grele">
+        <div class="gp-ov-thumb" style="background:linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 70%,#533483 100%);"></div>
+        <div class="gp-ov-info">
+          <div class="gp-ov-name">Épisodes de grêle</div>
+          <div class="gp-ov-sub">ERA5 · WMO 96/99 · 90 derniers jours</div>
+        </div>
+        <div class="gp-ov-toggle" id="tk-grele" onclick="togGrele()"><div class="tk-knob"></div></div>
+      </div>
+      <div class="gp-ov-detail" id="detail-grele">
+        <div class="gp-ov-src">Détection via code météo WMO + précipitations<br>
+        Marqueurs sur la carte · Cliquez pour le détail</div>
+      </div>
+
+      <!-- SOLS BRGM -->
+      <div class="gp-ov-item" id="ov-pedol">
+        <div class="gp-ov-thumb" style="background:linear-gradient(135deg,#5d4037,#8d6e63,#d4b483,#f5f5dc);"></div>
+        <div class="gp-ov-info">
+          <div class="gp-ov-name">Géologie &amp; Occupation sols</div>
+          <div class="gp-ov-sub">BRGM Géologie · Corine Land Cover 2018</div>
+        </div>
+        <div class="gp-ov-toggle" id="tk-pedol" onclick="togPedol()"><div class="tk-knob"></div></div>
+      </div>
+
+      <!-- HYDROGRAPHIE IGN -->
+      <div class="gp-ov-item" id="ov-hydro">
+        <div class="gp-ov-thumb" style="background:linear-gradient(135deg,#01579b,#0288d1,#4fc3f7,#b3e5fc);"></div>
+        <div class="gp-ov-info">
+          <div class="gp-ov-name">Réseau hydrographique</div>
+          <div class="gp-ov-sub">IGN Géoplateforme · Cours d'eau · Zones humides</div>
+        </div>
+        <div class="gp-ov-toggle" id="tk-hydro" onclick="togHydro()"><div class="tk-knob"></div></div>
+      </div>
+
+      <!-- AOC/AOP/IGP -->
+      <div class="gp-ov-item" id="ov-aoc">
+        <div class="gp-ov-thumb" style="background:linear-gradient(135deg,#4a148c,#7b1fa2,#ce93d8,#f8bbd0);"></div>
+        <div class="gp-ov-info">
+          <div class="gp-ov-name">Zones AOC / AOP / IGP</div>
+          <div class="gp-ov-sub">INAO · Appellations officielles</div>
+        </div>
+        <div class="gp-ov-toggle" id="tk-aoc" onclick="togAOC()"><div class="tk-knob"></div></div>
+      </div>
+      <div class="gp-ov-detail" id="det-catnat">
+        <div class="gp-ov-src">Arrêtés de catastrophe naturelle · Ministère de l'Intérieur</div>
+        <div id="catnat-status" class="catnat-loading" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANNEAU OUTILS -->
+
+    <!-- Panneau Outils -->
+  <div class="gp-panel" id="gpPanelOutils">
+    <div class="gp-panel-hdr">
+      <span>Outils terrain</span>
+      <button onclick="closeGpPanel('outils')" class="gp-panel-close">✕</button>
+    </div>
+    <div class="gp-panel-body">
+
+      <div class="gp-tool-section">Localisation</div>
+      <div class="gp-tool-item" onclick="startGPS()">
+        <div class="gp-tool-ic-wrap" style="background:#e3f2fd;color:#1565c0;">
+          <i class="fas fa-crosshairs"></i>
+        </div>
+        <div class="gp-tool-txt">
+          <div class="gp-tool-name">Ma position GPS</div>
+          <div class="gp-tool-desc">Suivi en temps réel sur le terrain</div>
+        </div>
+        <i class="fas fa-chevron-right gp-tool-arrow"></i>
+      </div>
+
+      <div class="gp-tool-section">Mesures</div>
+      <div class="gp-tool-item" id="btnLine" onclick="startMeasure('line')">
+        <div class="gp-tool-ic-wrap" style="background:#e8f5e9;color:#2e7d32;">
+          <i class="fas fa-ruler"></i>
+        </div>
+        <div class="gp-tool-txt">
+          <div class="gp-tool-name">Mesurer une distance</div>
+          <div class="gp-tool-desc">Tracez une ligne sur la carte</div>
+        </div>
+        <i class="fas fa-chevron-right gp-tool-arrow"></i>
+      </div>
+      <div class="gp-tool-item" id="btnArea" onclick="startMeasure('area')">
+        <div class="gp-tool-ic-wrap" style="background:#fff3e0;color:#e65100;">
+          <i class="fas fa-draw-polygon"></i>
+        </div>
+        <div class="gp-tool-txt">
+          <div class="gp-tool-name">Calculer une surface</div>
+          <div class="gp-tool-desc">Délimitez une zone sur la carte</div>
+        </div>
+        <i class="fas fa-chevron-right gp-tool-arrow"></i>
+      </div>
+
+      <div class="gp-tool-sep"></div>
+      <div class="gp-tool-item" onclick="clearAll()">
+        <div class="gp-tool-ic-wrap" style="background:#fdecea;color:#c62828;">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <div class="gp-tool-txt">
+          <div class="gp-tool-name" style="color:#c62828;">Effacer les mesures</div>
+          <div class="gp-tool-desc">Supprimer tous les tracés</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+    <!-- Panneau Infos -->
+  <div class="gp-panel" id="gpPanelInfos">
+    <div class="gp-panel-hdr">
+      <span>À propos</span>
+      <button onclick="closeGpPanel('infos')" class="gp-panel-close">✕</button>
+    </div>
+    <div class="gp-panel-body" style="padding:14px;">
+      <div style="text-align:center;padding:16px 0 20px;">
+        <svg width="48" height="48" viewBox="0 0 34 34" fill="none" style="margin-bottom:10px;">
+          <polygon points="17,2 30,9.5 30,24.5 17,32 4,24.5 4,9.5" fill="#0d2018" stroke="#2dbd8a" stroke-width="1.5"/>
+          <circle cx="17" cy="17" r="4" fill="none" stroke="#2dbd8a" stroke-width="1"/>
+          <circle cx="17" cy="17" r="2" fill="#2dbd8a"/>
+        </svg>
+        <div style="font-size:16px;font-weight:800;color:white;letter-spacing:2px;">TERRA<span style="color:var(--accent)">SCAN</span></div>
+        <div style="font-size:9px;color:var(--text-muted);font-family:var(--mono);margin-top:4px;">Expert sinistre agricole</div>
+      </div>
+      <div style="font-size:9px;color:var(--text-muted);font-family:var(--mono);line-height:1.8;border-top:1px solid var(--border);padding-top:12px;">
+        <div style="font-weight:700;color:rgba(255,255,255,.6);margin-bottom:4px;">Sources de données</div>
+        Sentinel-2 L2A · ESA/Copernicus<br>
+        IGN Géoplateforme · RPG/ASP 2023<br>
+        Open-Meteo · ERA5-Land ECMWF<br>
+        BRGM GéoSol · Géorisques
+      </div>
+      <div style="margin-top:14px;">
+        <button onclick="document.getElementById('modalLegal').style.display='flex'"
+          style="width:100%;padding:8px;background:var(--accent-dim);border:1px solid var(--bd);
+          color:var(--accent);font-family:var(--mono);font-size:9px;border-radius:8px;cursor:pointer;letter-spacing:.5px;">
+          ⚖️ Mentions légales &amp; Sources
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <!-- Panel Remonter le temps -->
+  <!-- Panel Remonter le temps IGN -->
+  <div id="histoPanel" class="histo-panel-wrap">
+    <div class="histo-hdr">
+      <span class="histo-title"><i class="fas fa-history"></i> Remonter le temps</span>
+      <button onclick="closeHisto()" class="histo-close">✕</button>
+    </div>
+    <div class="histo-years">
+      <button class="histo-btn" data-idx="0" onclick="loadHistoLayer(0)">2023</button>
+      <button class="histo-btn" data-idx="1" onclick="loadHistoLayer(1)">2019</button>
+      <button class="histo-btn" data-idx="2" onclick="loadHistoLayer(2)">2016</button>
+      <button class="histo-btn" data-idx="3" onclick="loadHistoLayer(3)">2013</button>
+      <button class="histo-btn" data-idx="4" onclick="loadHistoLayer(4)">2011</button>
+      <button class="histo-btn" data-idx="5" onclick="loadHistoLayer(5)">2006</button>
+      <button class="histo-btn" data-idx="6" onclick="loadHistoLayer(6)">2000</button>
+      <button class="histo-btn" data-idx="7" onclick="loadHistoLayer(7)">1985</button>
+    </div>
+    <div class="histo-hint">Cliquez sur une année pour comparer</div>
+  </div>
+
+    <!-- Menu export -->
+  <!-- Menu export (dropdown) -->
+  <div id="exportMenu" class="export-menu" style="display:none;">
+    <div class="export-menu-item" onclick="exportPDF();closeExportMenu()">
+      <i class="fas fa-file-pdf"></i>
+      <div>
+        <div class="export-item-title">Rapport PDF</div>
+        <div class="export-item-sub">Toutes les parcelles visitées + photos</div>
+      </div>
+    </div>
+    <div class="export-menu-item" onclick="exportJSON();closeExportMenu()">
+      <i class="fas fa-file-code"></i>
+      <div>
+        <div class="export-item-title">Export JSON</div>
+        <div class="export-item-sub">Données brutes de toutes les expertises</div>
+      </div>
+    </div>
+    <div class="export-menu-item" onclick="exportHistoryCSV();closeExportMenu()">
+      <i class="fas fa-file-csv"></i>
+      <div>
+        <div class="export-item-title">Export CSV</div>
+        <div class="export-item-sub">Tableau récapitulatif des dossiers</div>
+      </div>
+    </div>
+    <div class="export-menu-sep"></div>
+    <div class="export-menu-item" onclick="sendReportByEmail();closeExportMenu()">
+      <i class="fas fa-envelope"></i>
+      <div>
+        <div class="export-item-title">Envoyer par email</div>
+        <div class="export-item-sub">Ouvre votre client mail avec le rapport</div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Modales -->
+<div id="ndviComparePanel" style="display:none;position:fixed;
+  top:60px;left:50%;transform:translateX(-50%);
+  z-index:3000;background:#1a1f2e;border-radius:12px;
+  border:1px solid rgba(45,189,138,.25);
+  width:min(600px,95vw);max-height:80vh;overflow:hidden;
+  display:none;flex-direction:column;
+  box-shadow:0 8px 40px rgba(0,0,0,.5);">
+  <div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);
+    display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+    <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:13px;
+      color:var(--ts-accent);">📊 Comparaison NDVI multi-parcelles</div>
+    <button onclick="document.getElementById('ndviComparePanel').style.display='none'"
+      style="background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);
+      width:26px;height:26px;border-radius:6px;cursor:pointer;">✕</button>
+  </div>
+  <div style="padding:12px 16px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06);">
+    <div style="font-size:9px;color:rgba(255,255,255,.3);font-family:'DM Mono',monospace;
+      margin-bottom:8px;">Parcelles comparées</div>
+    <div id="compareList" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+    <button onclick="addCurrentToCompare()" style="margin-top:8px;
+      background:rgba(45,189,138,.12);border:1px solid rgba(45,189,138,.25);
+      color:var(--ts-accent);font-family:'DM Mono',monospace;font-size:9px;
+      padding:5px 12px;border-radius:6px;cursor:pointer;">
+      + Ajouter la parcelle active
+    </button>
+  </div>
+  <div style="padding:12px;flex:1;min-height:0;">
+    <canvas id="compareChart" style="width:100%;height:220px;"></canvas>
+  </div>
+</div>
+
+
+<!-- TABLEAU DE BORD -->
+
+<div id="modalDashboard" style="display:none;position:fixed;inset:0;z-index:4500;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
+  align-items:flex-start;justify-content:center;padding-top:60px;">
+  <div style="background:#1a1f2e;border-radius:14px;width:min(680px,95vw);
+    max-height:82vh;overflow:hidden;display:flex;flex-direction:column;
+    border:1px solid rgba(45,189,138,.2);">
+    <div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+      <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:14px;
+        color:var(--ts-accent);">📊 Tableau de bord</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="exportHistoryCSV()" style="background:rgba(45,189,138,.12);
+          border:1px solid rgba(45,189,138,.25);color:var(--ts-accent);
+          font-family:'DM Mono',monospace;font-size:9px;padding:5px 12px;
+          border-radius:6px;cursor:pointer;">↓ CSV</button>
+        <button onclick="sendReportByEmail()" style="background:rgba(255,255,255,.06);
+          border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.6);
+          font-family:'DM Mono',monospace;font-size:9px;padding:5px 12px;
+          border-radius:6px;cursor:pointer;">📧 Email</button>
+        <button onclick="document.getElementById('modalDashboard').style.display='none'"
+          style="background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.7);
+          width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px;">✕</button>
+      </div>
+    </div>
+    <div id="dashStats" style="overflow-y:auto;flex:1;padding:16px;"></div>
+  </div>
+</div>
+
+<!-- PANEL PHOTOS HISTORIQUES IGN -->
+
+<input type="file" id="photoInput" accept="image/*" multiple
+  style="display:none;" onchange="handlePhotoUpload(this)">
+
+<!-- VISIONNEUSE PHOTO -->
+
+<div id="photoViewerModal" style="display:none;position:fixed;inset:0;z-index:6000;
+  background:rgba(0,0,0,.9);align-items:center;justify-content:center;flex-direction:column;">
+  <button onclick="document.getElementById('photoViewerModal').style.display='none'"
+    style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);
+    border:none;color:white;width:36px;height:36px;border-radius:8px;
+    cursor:pointer;font-size:18px;z-index:1;">✕</button>
+  <img id="photoViewerImg" style="max-width:90vw;max-height:75vh;
+    border-radius:10px;object-fit:contain;">
+  <div style="margin-top:12px;width:min(500px,90vw);">
+    <input id="photoViewerLeg" type="text" placeholder="Ajouter une légende…"
+      oninput="savePhotoLegende(this)"
+      style="width:100%;padding:10px 14px;background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.2);border-radius:8px;color:white;
+      font-family:'DM Mono',monospace;font-size:12px;box-sizing:border-box;">
+  </div>
+</div>
+
+<!-- BARRE OUTILS ANNOTATIONS -->
+
+<div id="modalLegal" style="display:none;position:fixed;inset:0;z-index:5000;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+  display:none;align-items:center;justify-content:center;">
+  <div style="background:#1a1f2e;border-radius:14px;width:min(560px,92vw);
+    max-height:80vh;overflow-y:auto;padding:28px;position:relative;
+    border:1px solid rgba(45,189,138,.2);">
+    <button onclick="document.getElementById('modalLegal').style.display='none'"
+      style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);
+      border:none;color:rgba(255,255,255,.7);width:28px;height:28px;border-radius:6px;
+      cursor:pointer;font-size:14px;">✕</button>
+    <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:16px;
+      color:var(--ts-accent);margin-bottom:18px;letter-spacing:.3px;">
+      Mentions légales &amp; Données
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.9;
+      font-family:'DM Mono',monospace;">
+
+      <div style="font-weight:700;color:rgba(255,255,255,.9);margin-bottom:4px;">
+        Éditeur</div>
+      <p>TerraScan — Outil d'expertise sinistre agricole.<br>
+      Usage réservé aux professionnels agréés.</p>
+
+      <div style="font-weight:700;color:rgba(255,255,255,.9);margin:12px 0 4px;">
+        Sources de données</div>
+      <p>• Images satellite : <strong>Sentinel-2 L2A</strong> — ESA/Copernicus, 
+        via Sentinel Hub (Copernicus Data Space)<br>
+      • Fonds de carte : <strong>IGN Géoplateforme</strong> (Plan IGN v2, 
+        Orthophotos) — © IGN France<br>
+      • Fonds satellite : <strong>ESRI / Maxar</strong> — World Imagery<br>
+      • Parcelles PAC : <strong>RPG 2023</strong> — IGN / ASP, 
+        Ministère de l'Agriculture<br>
+      • Cadastre : <strong>PCI Vecteur</strong> — IGN Géoplateforme<br>
+      • Météo &amp; Normales : <strong>Open-Meteo</strong> — 
+        ERA5-Land, ECMWF 1991-2020<br>
+      • Risques naturels : <strong>Géorisques</strong> — 
+        Ministère de la Transition Écologique</p>
+
+      <div style="font-weight:700;color:rgba(255,255,255,.9);margin:12px 0 4px;">
+        Données personnelles</div>
+      <p>Aucune donnée personnelle n'est collectée ou transmise à des tiers.<br>
+      Les observations terrain sont stockées localement dans votre navigateur 
+      (localStorage) et ne quittent pas votre appareil.</p>
+
+      <div style="font-weight:700;color:rgba(255,255,255,.9);margin:12px 0 4px;">
+        Propriété intellectuelle</div>
+      <p>Les données cartographiques restent la propriété de leurs fournisseurs 
+      respectifs. L'utilisation de TerraScan est soumise aux conditions d'usage 
+      des APIs utilisées (Copernicus, IGN, ESRI).</p>
+
+      <div style="font-weight:700;color:rgba(255,255,255,.9);margin:12px 0 4px;">
+        Limitation de responsabilité</div>
+      <p>TerraScan est un outil d'aide à l'expertise. Les données affichées 
+      sont indicatives et ne se substituent pas au jugement de l'expert terrain. 
+      La résolution des images satellite (10m) peut limiter la précision 
+      des analyses sur de petites parcelles.</p>
+
+      <div style="margin-top:16px;padding-top:12px;
+        border-top:1px solid rgba(255,255,255,.08);
+        font-size:9px;color:rgba(255,255,255,.25);">
+        TerraScan v5 — Données open source — Usage professionnel
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Bouton historique dossiers -->
+
+  <div id="modalHistory" style="display:none;position:fixed;inset:0;z-index:4000;
+    background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+    align-items:flex-start;justify-content:center;padding-top:60px;">
+    <div style="background:#1a1f2e;border-radius:14px;width:min(700px,95vw);
+      max-height:80vh;overflow:hidden;display:flex;flex-direction:column;
+      border:1px solid rgba(45,189,138,.2);">
+      <div style="padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.08);
+        display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+        <div style="font-family:'Inter',sans-serif;font-weight:700;font-size:14px;
+          color:var(--ts-accent);">📋 Historique des dossiers</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button onclick="exportHistoryCSV()" style="background:rgba(45,189,138,.15);
+            border:1px solid rgba(45,189,138,.3);color:var(--ts-accent);
+            font-family:'DM Mono',monospace;font-size:9px;padding:5px 12px;
+            border-radius:6px;cursor:pointer;">↓ Export CSV</button>
+          <button onclick="document.getElementById('modalHistory').style.display='none'"
+            style="background:rgba(255,255,255,.08);border:none;
+            color:rgba(255,255,255,.7);width:28px;height:28px;border-radius:6px;
+            cursor:pointer;font-size:14px;">✕</button>
+        </div>
+      </div>
+      <div id="historyList" style="overflow-y:auto;flex:1;padding:12px;"></div>
+    </div>
+  </div>
+
+
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+  </div><!-- fin map-zone -->
+
+  <!-- Barre NDVI -->
+<div class="ndvi-bar" id="ndviBar">
+    <div class="nb-handle"></div>
+
+    <!-- EN-TÊTE compact -->
+    <div class="nb-hdr">
+      <div class="nb-title">
+        <span>🛰 NDVI Sentinel-2</span>
+        <span class="nb-badge" id="nbadge">Sentinel Hub · 10m</span>
+        <div class="tdot load" id="tdot"></div>
+        <span id="tstatus" style="font-size:9px;font-weight:400;opacity:.7;">Connexion…</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <!-- Filtre nuages -->
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);">
+          <i class="fas fa-cloud" style="font-size:9px;"></i>
+          <input type="range" min="0" max="1" step="0.05" value="0.8" id="ndviOpacity"
+            oninput="if(ndviLyr)ndviLyr.setOpacity(parseFloat(this.value))"
+            style="width:40px;height:3px;accent-color:var(--gd);"
+            title="Opacité NDVI">
+          <input type="range" min="0" max="100" value="60" id="cloudSl" 
+            oninput="onCloud(this.value)"
+            style="width:48px;height:3px;accent-color:var(--gd);">
+          <span id="cloudV" style="width:26px;">60%</span>
+        </div>
+        <span onclick="toggleNdvi()" style="cursor:pointer;font-size:15px;color:var(--t2);line-height:1;">✕</span>
+      </div>
+    </div>
+
+    <!-- CORPS -->
+    <div class="nb-body">
+
+      <!-- Ligne : date + boutons mode + indice -->
+      <div class="nb-mode-row">
+        <div class="nb-date-col">
+          <span class="tl-date-active" id="dateBig">—</span>
+          <span class="tl-cloud-active" id="tlCloudLabel"></span>
+        </div>
+        <!-- Boutons NDVI / Photo satellite -->
+        <div class="nb-layer-btns">
+          <button class="nb-layer-btn on" id="nbBtnNdvi" onclick="setGlobalLayerMode('ndvi',this)" title="Afficher NDVI">
+            <i class="fas fa-seedling"></i> NDVI
+          </button>
+          <button class="nb-layer-btn" id="nbBtnPhoto" onclick="setGlobalLayerMode('photo',this)" title="Photo satellite">
+            <i class="fas fa-satellite"></i> Photo
+          </button>
+        </div>
+        <!-- Sélecteur indice -->
+        <div class="nb-index-btns">
+          <button class="vegidx-btn on" data-idx="ndvi" onclick="setVegIndex('ndvi',this)">NDVI</button>
+          <button class="vegidx-btn" data-idx="evi" onclick="setVegIndex('evi',this)">EVI</button>
+          <button class="vegidx-btn" data-idx="ndwi" onclick="setVegIndex('ndwi',this)">NDWI</button>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div id="ndvNote" style="font-size:9px;color:var(--accent);">⏳ Chargement…</div>
+          <div id="dateSrc" style="font-size:9px;color:var(--t2);">Sentinel-2 L2A · 10m</div>
+          <span id="texp" style="font-size:9px;color:var(--t2);"></span>
+        </div>
+      </div>
+
+      <!-- TIMELINE chips dates — même style que détail parcellaire -->
+      <div class="ndvi-tl-wrap">
+        <div class="ndvi-tl-label">Sélectionner une date · <span id="ndviDateCount">—</span> images</div>
+        <div class="ndvi-tl-scroll" id="ndviTimeline"></div>
+      </div>
+
+      <!-- Légende NDVI -->
+      <div class="leg-row">
+      <!-- Slider timeline -->
+      <div style="padding:4px 14px;display:none;">
+        <input type="range" id="tlSlider" min="0" max="0" value="0"
+          style="width:100%;accent-color:var(--ts-accent);"
+          oninput="onTimeline(parseInt(this.value))">
+        <div id="tlTicks" style="display:flex;justify-content:space-between;
+          font-size:7px;color:rgba(255,255,255,.25);font-family:'DM Mono',monospace;"></div>
+      </div>
+        <span style="font-size:9px;color:var(--t2);white-space:nowrap;">Sol nu</span>
+        <div style="flex:1;">
+          <div class="leg-bar"></div>
+          <div class="leg-lbl"><span>-1</span><span>0</span><span>+1</span></div>
+        </div>
+        <span style="font-size:9px;color:var(--t2);white-space:nowrap;">Végét.</span>
+      </div>
+
+    </div>
+  </div>
+<!-- fin map-wrap -->
+
+</body>
+</html>
