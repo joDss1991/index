@@ -1176,16 +1176,19 @@ function setAnnotMode(mode){
   _drawingPts=[];
   if(_tempLayer){ map.removeLayer(_tempLayer); _tempLayer=null; }
 
-  // Mettre à jour les boutons
   document.querySelectorAll('.annot-btn').forEach(b=>{
     b.classList.toggle('on', b.dataset.mode===_annotMode);
   });
 
-  // Curseur
+  // Label de mode dans la toolbar
+  const lbl=document.getElementById('annotModeLabel');
+  const LABELS={zone:'Zone — cliquez pour délimiter',cercle:'Cercle — 1er clic = centre, 2e = rayon',fleche:'Flèche — 1er clic = départ, 2e = arrivée',texte:'Texte — cliquez sur la carte'};
+  if(lbl) lbl.textContent=_annotMode?(LABELS[_annotMode]||_annotMode):'Choisissez un outil';
+
   map.getContainer().style.cursor = _annotMode ? 'crosshair' : '';
 
   if(_annotMode){
-    showToast('✏️ Mode '+_annotMode+' — Cliquez sur la carte');
+    showToast('✏️ '+( LABELS[_annotMode]||_annotMode));
   }
 }
 
@@ -1318,6 +1321,7 @@ function persistAnnot(key,type,data){
 
 // Effacer toutes les annotations d'une parcelle
 function clearAnnotations(lat,lng){
+  if(!lat||!lng){ showToast('⚠️ Aucune parcelle sélectionnée'); return; }
   if(!confirm('Supprimer toutes les annotations de cette parcelle ?')) return;
   const key=getAnnotKey(lat,lng);
   (_annotLayers[key]||[]).forEach(l=>map.removeLayer(l));
@@ -4093,6 +4097,8 @@ function selectSplitDate(d){
 function closeSheet(){
   setTimeout(()=>map.invalidateSize(),50);
   document.getElementById('sheet').classList.remove('open');
+  // Réinitialiser comparaison N/N-1 pour la prochaine ouverture
+  _ndviYearOffset=0; _ndviCompareVals={};
   clearParcelOutline();
   window._shLat=null;window._shLng=null;
   window._ndviParcelLat=null;window._ndviParcelLng=null;
@@ -4900,8 +4906,8 @@ function buildNdviScoreHtml(){
 function toggleAnnotToolbar(){
   const tb=document.getElementById('annotToolbar');
   if(!tb) return;
-  const vis = tb.style.display==='flex';
-  tb.style.display = vis ? 'none' : 'flex';
+  const vis=tb.classList.contains('visible');
+  tb.classList.toggle('visible');
   if(vis && _annotMode) setAnnotMode(null);
 }
 
