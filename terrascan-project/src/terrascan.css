@@ -659,6 +659,7 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 #ndviNormalView{
   display:flex;flex-direction:column;
 }
+#ndviNormalView[style*="display:none"]{display:none!important;}
 #ndviNormalView .ndvi-map-wrap,
 #pane-ndvi .ndvi-map-wrap{
   height:200px !important;

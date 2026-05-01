@@ -3558,7 +3558,7 @@ async function openSheet(lat,lng){
       '</div>'+
 
       // ONGLET NDVI
-      '<div class="sh-pane on" id="pane-ndvi" style="display:flex;flex-direction:column;flex:1;">'+
+      '<div class="sh-pane on" id="pane-ndvi">'+
       // Barre sélection mode
       '<div style="display:flex;gap:6px;padding:8px 12px;background:#0d1117;border-bottom:1px solid rgba(255,255,255,.08);align-items:center;">'+
       '<button class="split-mode-btn on" id="btnModeNormal" onclick="setNdviViewMode(\'normal\',this)">Simple</button>'+
