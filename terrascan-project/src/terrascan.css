@@ -825,3 +825,59 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .wx-section-title{display:flex;align-items:center;gap:6px;}
 .wx-section-date{margin-left:auto;font-weight:700;color:#37474f;font-size:10px;}
 .wx-section-icon{font-size:16px;}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE: Timeline météo × NDVI
+═══════════════════════════════════════════════════════════ */
+.ndvi-tl-chip.sel{background:rgba(45,189,138,.22);border-color:var(--accent);}
+.ndvi-tl-evts{display:flex;justify-content:center;gap:1px;min-height:10px;margin-top:1px;}
+.ndvi-tl-evt{font-size:8px;line-height:1;cursor:help;}
+/* couleurs événements */
+.wx-evt-frost-hard{filter:hue-rotate(0deg);}
+.wx-evt-hail,.wx-evt-hail-prx{filter:hue-rotate(0deg);}
+
+.ndvi-tl-header{display:flex;align-items:center;justify-content:space-between;padding:6px 14px 2px;flex-shrink:0;}
+.ndvi-tl-wrap{background:#080e14;border-bottom:1px solid var(--border);flex-shrink:0;padding-bottom:6px;}
+.ndvi-tl-wrap .ndvi-tl-label{font-size:8px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.7px;font-family:var(--mono);white-space:nowrap;}
+.ndvi-tl-scroll{display:flex;gap:5px;overflow-x:auto;padding:0 14px 4px;scrollbar-width:none;}
+.ndvi-tl-scroll::-webkit-scrollbar{display:none;}
+
+/* Comparaison N/N-1 */
+.ndvi-yr-bar{display:flex;gap:3px;}
+.ndvi-yr-btn{font-size:8px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--text-muted);font-family:var(--mono);transition:all .12s;white-space:nowrap;}
+.ndvi-yr-btn.on{background:rgba(255,165,0,.15);border-color:rgba(255,165,0,.4);color:#ffb300;}
+.ndvi-tl-comp{font-size:6px;color:rgba(255,165,0,.6);font-family:var(--mono);margin-top:1px;}
+.ndvi-comp-bar{display:flex;align-items:center;gap:8px;padding:5px 14px;background:rgba(255,165,0,.07);border-bottom:1px solid rgba(255,165,0,.12);}
+.ndvi-comp-lbl{font-size:8px;font-weight:700;color:#ffb300;font-family:var(--mono);}
+.ndvi-comp-val{font-size:14px;font-weight:800;color:#ffb300;}
+.ndvi-comp-info{font-size:7px;color:rgba(255,165,0,.45);font-family:var(--mono);margin-left:auto;}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE: Galerie photos terrain
+═══════════════════════════════════════════════════════════ */
+.photo-type-row,.photo-filter-row{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:6px 0 2px;}
+.photo-type-lbl{font-size:8px;color:var(--text-dim);font-family:var(--mono);margin-right:2px;white-space:nowrap;}
+.photo-type-btn{font-size:8px;padding:2px 8px;border-radius:12px;cursor:pointer;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:var(--text-muted);font-family:var(--mono);transition:all .12s;white-space:nowrap;}
+.photo-type-btn.on{background:rgba(45,189,138,.18);border-color:var(--accent);color:var(--accent);}
+.photo-filter-btn{font-size:8px;padding:2px 7px;border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--text-muted);font-family:var(--mono);transition:all .12s;}
+.photo-filter-btn.on{background:rgba(33,150,243,.15);border-color:rgba(33,150,243,.3);color:#42a5f5;}
+
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px 0;}
+.photo-thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#080e14;cursor:pointer;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-thumb-date{position:absolute;bottom:0;left:0;right:0;padding:3px 5px;background:linear-gradient(transparent,rgba(0,0,0,.75));font-size:7px;color:rgba(255,255,255,.7);font-family:var(--mono);}
+.photo-type-badge{position:absolute;top:4px;left:4px;padding:1px 5px;border-radius:8px;background:rgba(0,0,0,.65);font-size:7px;color:white;font-family:var(--mono);white-space:nowrap;}
+.photo-del-btn{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:white;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.photo-empty{text-align:center;padding:16px;color:rgba(255,255,255,.2);font-size:10px;font-family:var(--mono);}
+.photo-add-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.photo-add-btn{padding:9px 6px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;border:none;font-family:var(--mono);transition:all .15s;text-align:center;}
+.photo-add-btn.camera{background:rgba(45,189,138,.15);border:1.5px solid rgba(45,189,138,.3);color:var(--accent);}
+.photo-add-btn.camera:hover{background:rgba(45,189,138,.25);}
+.photo-add-btn.gallery{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);color:var(--text-muted);}
+.photo-add-btn.gallery:hover{background:rgba(255,255,255,.1);}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE: Mode hors-ligne
+═══════════════════════════════════════════════════════════ */
+#offlineBanner{position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#e65100,#bf360c);color:white;padding:6px 16px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+#offlineBanner i{font-size:12px;}

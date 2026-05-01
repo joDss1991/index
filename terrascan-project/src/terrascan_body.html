@@ -76,6 +76,10 @@
     <button class="hdr-btn" onclick="copyShareUrl()" title="Copier le lien">
       <i class="fas fa-share-alt" style="font-size:14px;"></i>
     </button>
+    <!-- Précache offline -->
+    <button class="hdr-btn" onclick="precacheCurrentArea()" title="Mettre en cache la zone visible pour utilisation hors-ligne">
+      <i class="fas fa-download" style="font-size:13px;"></i>
+    </button>
     <!-- Export rapport -->
     <button class="hdr-btn accent" id="btnExportPdf" onclick="openExportMenu()" title="Exporter / Rapport">
       <i class="fas fa-file-export" style="font-size:14px;"></i>
@@ -84,6 +88,13 @@
 
   <div id="gdot" style="display:none;"></div>
   <span id="glbl" style="display:none;"></span>
+</div>
+
+<!-- Bannière hors-ligne -->
+<div id="offlineBanner" style="display:none;">
+  <i class="fas fa-wifi-slash"></i>
+  <span>Mode hors-ligne — données en cache uniquement</span>
+  <button onclick="if(navigator.onLine)_updateOfflineBanner()" title="Vérifier la connexion" style="background:none;border:none;color:white;cursor:pointer;padding:0 4px;font-size:12px;">↻</button>
 </div>
 
 <div class="map-wrap" id="mapWrap">
@@ -589,6 +600,8 @@
 <!-- PANEL PHOTOS HISTORIQUES IGN -->
 
 <input type="file" id="photoInput" accept="image/*" multiple
+  style="display:none;" onchange="handlePhotoUpload(this)">
+<input type="file" id="cameraInput" accept="image/*" capture="environment"
   style="display:none;" onchange="handlePhotoUpload(this)">
 
 <!-- VISIONNEUSE PHOTO -->

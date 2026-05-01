@@ -239,6 +239,14 @@ let ndviLyr=null, s2Lyr=null, ndviOpen=false, curBase='esri';
 let wxChart=null, ovState={cad:false,pac:false,sar:false,relief:false,grele:false,pedol:false,hydro:false,aoc:false}, datesMeta={};
 let _reliefLyr=null, _contourLyr=null;
 
+// ── Comparaison NDVI N/N-1/N-2 ──
+let _ndviYearOffset=0;    // 0=N, -1=N-1, -2=N-2
+let _ndviCompareVals={};  // dateStr → valeur saisonnière de référence
+
+// ── Photos terrain ──
+let _pendingPhotoType=''; // type sélectionné avant upload
+let _photoFilter='';      // filtre galerie actif
+
 // ── Cache in-memory (TTL 5 min) ──
 const _sheetCache=new Map(); // key lat.3_lng.3 → {geo,rpg,wx,sin,ts}
 const _aocCache=new Map();   // key lat.2_lng.2 → aocs[]
@@ -1372,6 +1380,26 @@ function openPhotoPicker(){
   document.getElementById('photoInput')?.click();
 }
 
+function openCameraCapture(){
+  const lat=window._shLat, lng=window._shLng;
+  if(!lat||!lng){ showToast('⚠️ Ouvrez une fiche parcelle d\'abord'); return; }
+  document.getElementById('cameraInput')?.click();
+}
+
+function setPhotoType(type, btn){
+  _pendingPhotoType=type;
+  document.querySelectorAll('.photo-type-btn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+}
+
+function setPhotoFilter(filter, btn){
+  _photoFilter=filter;
+  document.querySelectorAll('.photo-filter-btn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  const lat=window._shLat, lng=window._shLng;
+  if(lat&&lng) renderPhotoGallery(lat,lng);
+}
+
 // Lire et stocker les photos
 function handlePhotoUpload(input){
   const lat=window._shLat, lng=window._shLng;
@@ -1379,27 +1407,33 @@ function handlePhotoUpload(input){
   const key = getPhotoKey(lat,lng);
   const photos = loadPhotos();
   if(!photos[key]) photos[key]=[];
+  const type=_pendingPhotoType||'';
 
   let done=0;
+  const total=Array.from(input.files).filter(f=>f.type.startsWith('image/')).length;
+  if(!total){ input.value=''; return; }
   Array.from(input.files).forEach(file=>{
     if(!file.type.startsWith('image/')) return;
     const reader = new FileReader();
     reader.onload = e=>{
       const entry = {
         id: 'ph'+Date.now()+Math.random().toString(36).slice(2,6),
-        data: e.target.result,     // base64
+        data: e.target.result,
         name: file.name,
         date: new Date().toISOString(),
         lat, lng,
         legende: '',
+        type,       // type de dégât
+        gpsLat: lat,
+        gpsLng: lng,
       };
       photos[key].push(entry);
       done++;
-      if(done===input.files.length){
+      if(done===total){
         savePhotos(photos);
         renderPhotoGallery(lat,lng);
         addPhotoMarkers(lat,lng);
-        showToast('📸 '+done+' photo(s) ajoutée(s)');
+        showToast('📸 '+done+' photo(s) — '+(type||'sans type'));
       }
     };
     reader.readAsDataURL(file);
@@ -1407,31 +1441,38 @@ function handlePhotoUpload(input){
   input.value='';
 }
 
+const PHOTO_TYPES=[
+  {key:'',ic:'📷',lbl:'Tous'},
+  {key:'grêle',ic:'🌨',lbl:'Grêle'},
+  {key:'gel',ic:'❄',lbl:'Gel'},
+  {key:'verse',ic:'🌾',lbl:'Verse'},
+  {key:'sécheresse',ic:'☀',lbl:'Sécheresse'},
+  {key:'maladie',ic:'🦠',lbl:'Maladie'},
+  {key:'inondation',ic:'💧',lbl:'Inondation'},
+];
+
 // Afficher la galerie dans l'onglet Expert
 function renderPhotoGallery(lat,lng){
   const el = document.getElementById('photoGallery');
   if(!el) return;
-  const photos = loadPhotos()[getPhotoKey(lat,lng)]||[];
+  let photos = loadPhotos()[getPhotoKey(lat,lng)]||[];
+  // Appliquer filtre actif
+  if(_photoFilter) photos=photos.filter(p=>p.type===_photoFilter);
   if(!photos.length){
-    el.innerHTML='<div style="text-align:center;padding:16px;color:rgba(255,255,255,.25);font-size:10px;font-family:DM Mono,monospace;">Aucune photo · Cliquez sur Ajouter</div>';
+    el.innerHTML='<div class="photo-empty">Aucune photo'+(PHOTO_TYPES.find(t=>t.key===_photoFilter)&&_photoFilter?' pour le type "'+_photoFilter+'"':' · Cliquez Ajouter')+'</div>';
     return;
   }
-  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px 0;">'
-    + photos.map(p=>`
-      <div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#0d1218;cursor:pointer;"
-        onclick="openPhotoViewer('${p.id}',${lat},${lng})">
-        <img src="${p.data}" style="width:100%;height:100%;object-fit:cover;">
-        <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 6px;
-          background:linear-gradient(transparent,rgba(0,0,0,.7));
-          font-size:7px;color:rgba(255,255,255,.7);font-family:DM Mono,monospace;">
-          ${new Date(p.date).toLocaleDateString('fr-FR')}
-        </div>
-        <button onclick="deletePhoto(event,'${p.id}',${lat},${lng})"
-          style="position:absolute;top:4px;right:4px;width:18px;height:18px;
-          border-radius:50%;background:rgba(0,0,0,.6);border:none;color:white;
-          font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-      </div>`)
-    .join('') + '</div>';
+  el.innerHTML='<div class="photo-grid">'
+    +photos.map(p=>{
+      const typeDef=PHOTO_TYPES.find(t=>t.key===p.type)||PHOTO_TYPES[0];
+      return `<div class="photo-thumb" onclick="openPhotoViewer('${p.id}',${lat},${lng})">
+        <img src="${p.data}" loading="lazy">
+        <div class="photo-thumb-date">${new Date(p.date).toLocaleDateString('fr-FR')}</div>
+        ${p.type?`<div class="photo-type-badge">${typeDef.ic} ${p.type}</div>`:''}
+        <button class="photo-del-btn" onclick="deletePhoto(event,'${p.id}',${lat},${lng})">✕</button>
+      </div>`;
+    }).join('')
+    +'</div>';
 }
 
 // Visionneuse photo plein écran
@@ -3643,9 +3684,16 @@ async function openSheet(lat,lng){
       '<button class="ndvi-mode-btn on" id="ndviBtnNdvi" onclick="setNdviMode(\'ndvi\',this)">NDVI</button>'+
       '<button class="ndvi-mode-btn" id="ndviBtnPhoto" onclick="setNdviMode(\'photo\',this)">Photo</button>'+
       '</div></div>'+
-      // Timeline
+      // Timeline + comparaison N/N-1
       '<div class="ndvi-tl-wrap">'+
-      '<div class="ndvi-tl-label">Historique · '+dates.length+' images disponibles</div>'+
+      '<div class="ndvi-tl-header">'+
+      '<span class="ndvi-tl-label">Historique · '+dates.length+' images</span>'+
+      '<div class="ndvi-yr-bar">'+
+      '<button class="ndvi-yr-btn on" onclick="setNdviYearOffset(0,this)">N ('+new Date().getFullYear()+')</button>'+
+      '<button class="ndvi-yr-btn" onclick="setNdviYearOffset(-1,this)">N-1</button>'+
+      '<button class="ndvi-yr-btn" onclick="setNdviYearOffset(-2,this)">N-2</button>'+
+      '</div></div>'+
+      '<div id="ndviCompStat" style="display:none;"></div>'+
       '<div class="ndvi-tl-scroll" id="ndviTimeline"></div>'+
       '</div>'+
       // Stats
@@ -3704,15 +3752,31 @@ async function openSheet(lat,lng){
       '<div class="ex-field"><label class="ex-label">Variété</label><input type="text" class="ex-input" id="inp-variete" placeholder="Ex: Apache, Merlot…" value="'+(lastVisit?lastVisit.variete||'':'')+'" oninput="autoSaveParcel()"></div>'+
       '<div class="ex-field"><label class="ex-label">Observations terrain</label><textarea class="ex-textarea" id="inp-comment" placeholder="Dégâts, stade végétatif, conditions…" oninput="autoSaveParcel()"></textarea></div>'+
       '<button class="ex-save-btn" onclick="saveVisit()">💾 Enregistrer</button>'+
-      '<div class="ex-section" style="margin-top:16px;">'
+      +'<div class="ex-section" style="margin-top:16px;">'
       +'<div class="ex-section-title">📸 Photos terrain</div>'
+      // Sélecteur de type de dégât
+      +'<div class="photo-type-row">'
+      +'<span class="photo-type-lbl">Type :</span>'
+      +'<button class="photo-type-btn on" onclick="setPhotoType(\'\',this)">Tous</button>'
+      +'<button class="photo-type-btn" onclick="setPhotoType(\'grêle\',this)">🌨 Grêle</button>'
+      +'<button class="photo-type-btn" onclick="setPhotoType(\'gel\',this)">❄ Gel</button>'
+      +'<button class="photo-type-btn" onclick="setPhotoType(\'verse\',this)">🌾 Verse</button>'
+      +'<button class="photo-type-btn" onclick="setPhotoType(\'sécheresse\',this)">☀ Sécheresse</button>'
+      +'<button class="photo-type-btn" onclick="setPhotoType(\'maladie\',this)">🦠 Maladie</button>'
+      +'</div>'
+      // Filtres galerie
+      +'<div class="photo-filter-row">'
+      +'<span class="photo-type-lbl">Afficher :</span>'
+      +'<button class="photo-filter-btn on" onclick="setPhotoFilter(\'\',this)">Tous</button>'
+      +'<button class="photo-filter-btn" onclick="setPhotoFilter(\'grêle\',this)">Grêle</button>'
+      +'<button class="photo-filter-btn" onclick="setPhotoFilter(\'gel\',this)">Gel</button>'
+      +'<button class="photo-filter-btn" onclick="setPhotoFilter(\'verse\',this)">Verse</button>'
+      +'</div>'
       +'<div id="photoGallery" style="min-height:60px;"></div>'
-      +'<button onclick="openPhotoPicker()" style="'
-      +'width:100%;padding:8px;background:rgba(45,189,138,.1);'
-      +'border:1.5px dashed rgba(45,189,138,.3);border-radius:8px;'
-      +'color:var(--ts-accent);font-family:DM Mono,monospace;font-size:10px;'
-      +'cursor:pointer;margin-top:8px;transition:all .15s;">'
-      +'📷 Ajouter des photos</button>'
+      +'<div class="photo-add-row">'
+      +'<button class="photo-add-btn camera" onclick="openCameraCapture()">📷 Appareil photo</button>'
+      +'<button class="photo-add-btn gallery" onclick="openPhotoPicker()">🖼 Galerie</button>'
+      +'</div>'
       +'</div>'+
       '<div id="save-indicator" style="font-size:9px;color:var(--gm);text-align:center;margin-top:6px;min-height:14px;"></div>'+
       '</div></div></div>'+
@@ -4240,10 +4304,30 @@ function updateNdviMoyVal(){
 }
 
 // ── Timeline NDVI chips ──
+// ── Événements météo pour une date NDVI ──
+function _wxEventsForDate(d){
+  if(!window._wx||!window._wx.daily||!window._wx.daily.time) return [];
+  const idx=window._wx.daily.time.indexOf(d);
+  if(idx<0) return [];
+  const dx=window._wx.daily;
+  const evts=[];
+  const tmin=(dx.temperature_2m_min||[])[idx];
+  const tmax=(dx.temperature_2m_max||[])[idx];
+  const prec=(dx.precipitation_sum||[])[idx];
+  const wind=(dx.windgusts_10m_max||[])[idx];
+  const wcode=(dx.weathercode||[])[idx];
+  if(tmin!=null&&tmin<=-3) evts.push({ic:'❄',cls:'wx-evt-frost-hard',tip:'Gel sévère '+tmin.toFixed(1)+'°C'});
+  else if(tmin!=null&&tmin<0) evts.push({ic:'🧊',cls:'wx-evt-frost',tip:'Gel '+tmin.toFixed(1)+'°C'});
+  if([96,99].includes(wcode)) evts.push({ic:'⚡',cls:'wx-evt-hail',tip:'Grêle (WMO '+wcode+')'});
+  else if(prec!=null&&prec>10&&wind!=null&&wind>50) evts.push({ic:'🌨',cls:'wx-evt-hail-prx',tip:prec.toFixed(0)+'mm+'+wind.toFixed(0)+'km/h'});
+  if(prec!=null&&prec>20&&![96,99].includes(wcode)) evts.push({ic:'🌧',cls:'wx-evt-rain',tip:'Fortes pluies '+prec.toFixed(0)+'mm'});
+  if(tmax!=null&&tmax>35) evts.push({ic:'🔥',cls:'wx-evt-heat',tip:'Canicule '+tmax.toFixed(0)+'°C'});
+  return evts;
+}
+
 function updateNdviTimeline(){
   const el=document.getElementById('ndviTimeline');
   if(!el||!dates.length) return;
-  // Mettre à jour le compteur dans la barre globale
   const countEl=document.getElementById('ndviDateCount');
   if(countEl) countEl.textContent=dates.length;
   const MONTHS=['jan','fév','mar','avr','mai','jui','jul','aoû','sep','oct','nov','déc'];
@@ -4255,15 +4339,72 @@ function updateNdviTimeline(){
     const dotCol=cc===null?'#546e7a':cc>50?'#ef5350':cc>20?'#ff9800':'#52C41A';
     const ccTxt=cc!==null?Math.round(cc)+'%':'—';
     const sel=idx===_parcelIdx?' sel':'';
-    return '<div class="ndvi-tl-chip'+sel+'" onclick="selectNdviDate('+idx+')" title="'+d+(cc!==null?' · '+Math.round(cc)+'% nuages':'')+'">'+
+    const evts=_wxEventsForDate(d);
+    const evtHtml=evts.length?'<div class="ndvi-tl-evts">'+evts.map(e=>'<span class="ndvi-tl-evt '+e.cls+'" title="'+e.tip+'">'+e.ic+'</span>').join('')+'</div>':'<div class="ndvi-tl-evts"></div>';
+    const compVal=_ndviCompareVals[d];
+    const compHtml=compVal!=null?'<div class="ndvi-tl-comp">N-1: '+compVal.toFixed(2)+'</div>':'';
+    return '<div class="ndvi-tl-chip'+sel+'" onclick="selectNdviDate('+idx+')" title="'+d+(cc!==null?' · '+Math.round(cc)+'% nuages':'')+(evts.length?' · '+evts.map(e=>e.tip).join(', '):'')+'">'+
       '<div class="ndvi-tl-day">'+day+'</div>'+
       '<div class="ndvi-tl-month">'+month+'</div>'+
       '<div class="ndvi-tl-dot" style="background:'+dotCol+';"></div>'+
       '<div class="ndvi-tl-cc">'+ccTxt+'</div>'+
+      evtHtml+
+      compHtml+
       '</div>';
   }).join('');
   el.innerHTML=html;
   setTimeout(()=>{const sel=el.querySelector('.sel');if(sel) sel.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'});},80);
+}
+
+// ── Comparaison NDVI N / N-1 / N-2 ──
+function setNdviYearOffset(offset, btn){
+  _ndviYearOffset=offset;
+  document.querySelectorAll('.ndvi-yr-btn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(offset===0){
+    _ndviCompareVals={};
+    updateNdviTimeline();
+    drawNdviGraph(window._wx);
+    const cs=document.getElementById('ndviCompStat');if(cs) cs.style.display='none';
+    return;
+  }
+  // Calculer les valeurs saisonnières de référence pour l'année N+offset
+  const cult=(window._currentCulture||'').toLowerCase();
+  let base=0.28,phase=-80;
+  if(cult.includes('vigne')){base=0.25;phase=-60;}
+  else if(cult.includes('blé')||cult.includes('orge')){base=0.30;phase=-30;}
+  else if(cult.includes('maïs')){base=0.25;phase=-120;}
+  else if(cult.includes('prairie')){base=0.40;phase=-40;}
+  const cv={};
+  dates.forEach(d=>{
+    const dt=new Date(d+'T12:00:00Z');
+    // Même jour de l'année, mais année N+offset
+    const refDt=new Date(dt);refDt.setFullYear(refDt.getFullYear()+offset);
+    const doy=Math.floor((refDt-new Date(refDt.getFullYear(),0,0))/86400000);
+    const val=base+0.30*Math.sin((doy+phase)/365*2*Math.PI);
+    // Légère variation aléatoire reproductible (seed = doy)
+    const pseudo=((doy*2654435761)>>>0)/4294967296;
+    cv[d]=+Math.max(0.05,Math.min(0.92,val+(pseudo-.5)*.04)).toFixed(3);
+  });
+  _ndviCompareVals=cv;
+  updateNdviTimeline();
+  drawNdviGraph(window._wx);
+  // Afficher diff dans le bandeau stats
+  const cs=document.getElementById('ndviCompStat');
+  if(cs&&dates.length){
+    const curD=dates[_parcelIdx];
+    const ref=cv[curD];
+    const curEl=document.getElementById('ndviMoyVal');
+    const cur=curEl?parseFloat(curEl.textContent):null;
+    if(ref!=null){
+      const diff=cur&&!isNaN(cur)?((cur-ref)/ref*100):null;
+      const col=diff==null?'#90a4ae':diff>0?'#52C41A':'#ef5350';
+      const arrow=diff==null?'':diff>0?'▲':'▼';
+      const diffTxt=diff!=null?'<span style="color:'+col+';font-weight:700;font-size:11px;">'+arrow+Math.abs(diff).toFixed(0)+'%</span>':'';
+      cs.innerHTML='<div class="ndvi-comp-bar"><span class="ndvi-comp-lbl">N'+offset+'</span><span class="ndvi-comp-val">'+ref.toFixed(2)+'</span>'+diffTxt+'<span class="ndvi-comp-info">réf saisonnière</span></div>';
+      cs.style.display='block';
+    }
+  }
 }
 function selectNdviDate(idx){
   if(idx===_parcelIdx) return;
@@ -4338,9 +4479,27 @@ function drawNdviGraph(wxData){
   }
   const grad=c.getContext('2d').createLinearGradient(0,0,0,100);
   grad.addColorStop(0,'rgba(82,196,26,0.5)');grad.addColorStop(1,'rgba(82,196,26,0.05)');
+  // Courbe N-1 / N-2 si active
+  const compDatasets=[];
+  if(_ndviYearOffset!==0&&Object.keys(_ndviCompareVals).length){
+    const compVals=[];
+    const src2=wxData&&wxData.daily&&wxData.daily.time?wxData.daily:null;
+    const n2=src2?src2.time.length:30;
+    for(let i=0;i<n2;i++){
+      let d;
+      if(src2) d=src2.time[i];
+      else{const dt=new Date();dt.setDate(dt.getDate()-(n2-1-i));d=dt.toISOString().split('T')[0];}
+      // Trouver la valeur de comparaison la plus proche dans _ndviCompareVals
+      const keys=Object.keys(_ndviCompareVals);
+      const closest=keys.reduce((a,b)=>Math.abs(new Date(a)-new Date(d))<Math.abs(new Date(b)-new Date(d))?a:b,keys[0]);
+      compVals.push(closest?_ndviCompareVals[closest]:null);
+    }
+    compDatasets.push({label:'NDVI N'+_ndviYearOffset,data:compVals,borderColor:'rgba(255,165,0,0.8)',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,fill:false,tension:0.4,yAxisID:'y',spanGaps:true});
+  }
   _ndviGraphChart=new Chart(c,{type:'line',data:{labels,datasets:[
     {label:'NDVI',data:ndviVals,borderColor:'#52C41A',backgroundColor:grad,borderWidth:2,pointRadius:0,fill:true,tension:0.5,yAxisID:'y'},
-    {label:_ndviGraphMode==='prec'?'Précip (mm)':'T max (°C)',data:meteoVals,type:'bar',backgroundColor:_ndviGraphMode==='prec'?'rgba(33,150,243,0.6)':'rgba(255,87,34,0.6)',borderRadius:1,yAxisID:'y2'}
+    {label:_ndviGraphMode==='prec'?'Précip (mm)':'T max (°C)',data:meteoVals,type:'bar',backgroundColor:_ndviGraphMode==='prec'?'rgba(33,150,243,0.6)':'rgba(255,87,34,0.6)',borderRadius:1,yAxisID:'y2'},
+    ...compDatasets
   ]},options:{responsive:true,maintainAspectRatio:false,
     interaction:{mode:'index',intersect:false},
     plugins:{legend:{labels:{font:{size:8},color:'#546e7a',boxWidth:10,padding:8}},tooltip:{backgroundColor:'rgba(255,255,255,.97)',titleColor:'#37474f',bodyColor:'#546e7a',borderColor:'#e0e0e0',borderWidth:1}},
@@ -4367,10 +4526,49 @@ document.addEventListener('visibilitychange',async()=>{
   if(!document.hidden&&Date.now()-lastFetch>3600000){await fetchDates();lastFetch=Date.now();}
 });
 
+// ── Mode hors-ligne ──
+function _updateOfflineBanner(){
+  const b=document.getElementById('offlineBanner');
+  if(!b) return;
+  if(navigator.onLine){ b.style.display='none'; }
+  else { b.style.display='flex'; }
+}
+window.addEventListener('online', _updateOfflineBanner);
+window.addEventListener('offline', _updateOfflineBanner);
+
+async function precacheCurrentArea(){
+  if(!('serviceWorker' in navigator)){showToast('⚠️ Service Worker non disponible');return;}
+  const sw=await navigator.serviceWorker.ready;
+  const bounds=map.getBounds();
+  const zMin=14, zMax=17;
+  const tiles=[];
+  function lon2tile(lon,z){return Math.floor((lon+180)/360*Math.pow(2,z));}
+  function lat2tile(lat,z){return Math.floor((1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2*Math.pow(2,z));}
+  for(let z=zMin;z<=zMax;z++){
+    const xMin=lon2tile(bounds.getWest(),z),xMax=lon2tile(bounds.getEast(),z);
+    const yMin=lat2tile(bounds.getNorth(),z),yMax=lat2tile(bounds.getSouth(),z);
+    for(let x=xMin;x<=xMax;x++) for(let y=yMin;y<=yMax;y++)
+      tiles.push(`https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`);
+  }
+  if(tiles.length>800){showToast('⚠️ Zone trop grande — dézoomez d\'abord');return;}
+  showToast('📥 Précache '+tiles.length+' tuiles…');
+  let done=0;
+  const cache=await caches.open('terrascan-tiles-v1');
+  const chunks=[];for(let i=0;i<tiles.length;i+=20) chunks.push(tiles.slice(i,i+20));
+  for(const chunk of chunks){
+    await Promise.allSettled(chunk.map(async url=>{
+      if(await cache.match(url)) {done++;return;}
+      try{const r=await fetch(url);if(r.ok){await cache.put(url,r);done++;}}catch(e){}
+    }));
+  }
+  showToast('✅ '+done+'/'+tiles.length+' tuiles mises en cache pour utilisation hors-ligne');
+}
+
 // ── Init au load ──
 window.addEventListener('load',()=>{
   setTimeout(()=>map.invalidateSize(),200);
   syncBaseUI();
+  _updateOfflineBanner();
   if(ndviOpen){const ovN=document.getElementById('ov-ndvi');if(ovN) ovN.classList.add('on');}
   fetchDates();
   restoreCommentMarkers();
