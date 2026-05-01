@@ -23,6 +23,7 @@ if('serviceWorker' in navigator){
    ═══════════════════════════════════════════════════════════════ */
 :root{
   --accent:#2dbd8a;--accent-dark:#1a6b3c;--accent-dim:rgba(45,189,138,.15);
+  --ts-accent:#2dbd8a;
   --bg-dark:#0a1218;--bg-panel:#1a1f2e;--bg-card:#141824;
   --text-primary:rgba(255,255,255,.9);--text-muted:rgba(255,255,255,.45);
   --text-dim:rgba(255,255,255,.2);--border:rgba(255,255,255,.08);
@@ -214,8 +215,8 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .visit-card-preview{font-size:9px;color:#78909c;margin-top:3px;font-family:var(--mono);}
 
 /* ── Sinistres ── */
-.sin-pane{flex:1;overflow-y:auto;}
-.sin-risk-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:0 14px 10px;}
+.sin-pane{flex:1;overflow-y:auto;padding:14px;}
+.sin-risk-row{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;padding:0 0 10px;}
 .sin-risk-card{border-radius:8px;padding:8px 6px;text-align:center;border:1px solid rgba(0,0,0,.06);}
 .sin-risk-val{font-size:14px;font-weight:800;color:#37474f;}
 .sin-risk-lbl{font-size:8px;color:#90a4ae;font-family:var(--mono);margin-top:2px;}
@@ -765,6 +766,43 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .catnat-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(45,189,138,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
 .catnat-loading{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--text-muted);font-family:var(--mono);padding:6px 12px;}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══════════════════════════════════════
+   CORRECTIFS AFFICHAGE v6.3
+   ══════════════════════════════════════ */
+
+/* ── Loader spinner ── */
+.loader{position:fixed;inset:0;z-index:8000;background:rgba(10,18,24,.7);display:none;align-items:center;justify-content:center;}
+.loader.show{display:flex;}
+.lbox{display:flex;flex-direction:column;align-items:center;gap:12px;background:var(--bg-panel);border:1px solid var(--border);border-radius:12px;padding:24px 32px;}
+.spin{width:28px;height:28px;border:3px solid rgba(45,189,138,.2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+
+/* ── Backdrop mobile ── */
+.backdrop{position:fixed;inset:0;z-index:570;background:rgba(0,0,0,.5);display:none;}
+.backdrop.show{display:block;}
+
+/* ── Drag handle de la fiche ── */
+.sh-handle{width:36px;height:4px;border-radius:2px;background:rgba(0,0,0,.15);margin:8px auto 0;flex-shrink:0;}
+
+/* ── Badge couches actives ── */
+.gp-badge{position:absolute;top:6px;right:6px;min-width:16px;height:16px;border-radius:8px;background:#e53935;color:white;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;font-family:var(--mono);}
+
+/* ── Sinistres — accordéon ── */
+.sin-detail .sin-detail-body{display:none;}
+.sin-detail.open .sin-detail-body{display:block;}
+.sin-detail.open .sin-chevron{transform:rotate(180deg);}
+.sin-detail-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+
+/* ── Sin-pane : ajustement marges pour le header risque full-width ── */
+.sin-pane>div:first-child{margin-left:-14px;margin-right:-14px;margin-top:-14px;}
+
+/* ── Météo : wx-gauge-bar corrections ── */
+.wx-gauge-bar-wrap{position:relative;}
+.wx-gauge-bar-norm{position:absolute;top:0;left:0;height:100%;border-radius:4px;opacity:.35;}
+.wx-gauge-bar-cur{position:absolute;top:0;left:0;height:100%;border-radius:4px;transition:width .5s;}
+
+/* ── Info pane padding ── */
+.info-pane{padding-bottom:20px;}
 
 </style>
 <body>
