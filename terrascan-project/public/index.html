@@ -1875,6 +1875,14 @@ let ndviLyr=null, s2Lyr=null, ndviOpen=false, curBase='esri';
 let wxChart=null, ovState={cad:false,pac:false,sar:false,relief:false,grele:false,pedol:false,hydro:false,aoc:false}, datesMeta={};
 let _reliefLyr=null, _contourLyr=null;
 
+// ── Cache in-memory (TTL 5 min) ──
+const _sheetCache=new Map(); // key lat.3_lng.3 → {geo,rpg,wx,sin,ts}
+const _aocCache=new Map();   // key lat.2_lng.2 → aocs[]
+const _rendCache=new Map();  // key lat.2_lng.2_code → rendement
+const _CACHE_TTL=5*60*1000;
+function _cacheGet(map,key){const e=map.get(key);return e&&Date.now()-e.ts<_CACHE_TTL?e.v:null;}
+function _cacheSet(map,key,v){map.set(key,{v,ts:Date.now()});}
+
 
 
 // ── Stades phénologiques BBCH ──
@@ -2460,6 +2468,9 @@ function togAOC(){
 }
 
 async function fetchAOC(lat, lng){
+  const _ak=lat.toFixed(2)+'_'+lng.toFixed(2);
+  const _ac=_cacheGet(_aocCache,_ak);
+  if(_ac!==null) return _ac;
   try{
     const url='https://www.inao.gouv.fr/server/rest/services/produits_INAO/MapServer/0/query'
       +'?geometry='+lng+','+lat+'&geometryType=esriGeometryPoint&inSR=4326'
@@ -2467,13 +2478,16 @@ async function fetchAOC(lat, lng){
     const r=await fetch(url);
     const d=await r.json();
     if(d.features?.length){
-      return d.features.map(f=>({
+      const aocs=d.features.map(f=>({
         nom: f.attributes.appellation||f.attributes.NOM||'—',
         type: f.attributes.type_ig||'IGP',
         produit: f.attributes.produit||'—',
       }));
+      _cacheSet(_aocCache,_ak,aocs);
+      return aocs;
     }
   }catch(e){}
+  _cacheSet(_aocCache,_ak,[]);
   return [];
 }
 
@@ -2585,6 +2599,9 @@ const RENDEMENTS_DEPT = {
 
 async function fetchRendement(lat, lng, codeRpg){
   if(!codeRpg || !RENDEMENTS_REF[codeRpg]) return null;
+  const _rk=lat.toFixed(2)+'_'+lng.toFixed(2)+'_'+codeRpg;
+  const _rc=_cacheGet(_rendCache,_rk);
+  if(_rc!==null) return _rc;
 
   // Trouver le département depuis les coords
   let dept = 'default';
@@ -2600,7 +2617,7 @@ async function fetchRendement(lat, lng, codeRpg){
   const deptData = RENDEMENTS_DEPT[dept] || RENDEMENTS_DEPT['default'];
   const rendDept = deptData[codeRpg] || ref.moy;
 
-  return {
+  const result={
     culture: ref.nom,
     unit: ref.unit,
     national: ref.moy,
@@ -2609,6 +2626,8 @@ async function fetchRendement(lat, lng, codeRpg){
     min: ref.min,
     max: ref.max,
   };
+  _cacheSet(_rendCache,_rk,result);
+  return result;
 }
 
 function buildRendementHtml(rend, surface){
@@ -5085,18 +5104,40 @@ async function openSheet(lat,lng){
     document.getElementById('cpill').textContent='…';
     document.getElementById('shBody').innerHTML='<div style="text-align:center;padding:40px 20px;"><div style="width:26px;height:26px;border:3px solid #e0e0e0;border-top-color:var(--gm);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;"></div><div style="font-size:11px;color:var(--t2);">Récupération des données…</div></div>';
 
-    const [geo,rpgWfs,wx]=await Promise.allSettled([
-      fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&accept-language=fr').then(r=>r.json()),
-      (async ()=>{
-        const cql='INTERSECTS(geom,POINT('+lng+' '+lat+'))';
-        const url1='https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=RPG.LATEST:parcelles_graphiques&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=1&CQL_FILTER='+encodeURIComponent(cql);
-        try{const r1=await fetch(url1);const d1=await r1.json();if(d1.features&&d1.features.length>0) return d1;}catch(e){}
-        const dl2=0.0008;
-        const url2='https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=RPG.LATEST:parcelles_graphiques&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=10&BBOX='+(lng-dl2)+','+(lat-dl2)+','+(lng+dl2)+','+(lat+dl2)+',EPSG:4326';
-        return await (await fetch(url2)).json();
-      })(),
-      fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lng+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,windgusts_10m_max,weathercode,et0_fao_evapotranspiration&current_weather=true&past_days=30&forecast_days=7&timezone=Europe/Paris').then(r=>r.json())
-    ]);
+    // ── Cache : clé quantisée à 3 décimales (~111m) ──
+    const _ck=lat.toFixed(3)+'_'+lng.toFixed(3);
+    const _cached=_cacheGet(_sheetCache,_ck);
+
+    let geo,rpgWfs,wx,sinR;
+    if(_cached){
+      ({geo,rpgWfs,wx,sinR}=_cached);
+    } else {
+      // ── Tous les fetches en parallèle ──
+      const sinDate=new Date();sinDate.setDate(sinDate.getDate()-90);
+      const sinParams=['temperature_2m_min','temperature_2m_max','precipitation_sum','precipitation_hours','windgusts_10m_max','et0_fao_evapotranspiration','snowfall_sum','showers_sum','weathercode'].join(',');
+      const sinUrl='https://archive-api.open-meteo.com/v1/archive?latitude='+lat+'&longitude='+lng+'&start_date='+sinDate.toISOString().split('T')[0]+'&end_date='+new Date().toISOString().split('T')[0]+'&daily='+sinParams+'&timezone=Europe/Paris';
+
+      [geo,rpgWfs,wx,sinR]=await Promise.allSettled([
+        fetch('https://nominatim.openstreetmap.org/reverse?lat='+lat+'&lon='+lng+'&format=json&accept-language=fr').then(r=>r.json()),
+        (async ()=>{
+          // ── RPG : les 2 URLs en parallèle, on prend la première qui retourne des features ──
+          const cql='INTERSECTS(geom,POINT('+lng+' '+lat+'))';
+          const url1='https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=RPG.LATEST:parcelles_graphiques&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=1&CQL_FILTER='+encodeURIComponent(cql);
+          const dl2=0.0008;
+          const url2='https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature&TYPENAMES=RPG.LATEST:parcelles_graphiques&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=10&BBOX='+(lng-dl2)+','+(lat-dl2)+','+(lng+dl2)+','+(lat+dl2)+',EPSG:4326';
+          const [r1,r2]=await Promise.allSettled([
+            fetch(url1).then(r=>r.json()),
+            fetch(url2).then(r=>r.json()),
+          ]);
+          if(r1.status==='fulfilled'&&r1.value?.features?.length>0) return r1.value;
+          if(r2.status==='fulfilled'&&r2.value?.features?.length>0) return r2.value;
+          return {features:[]};
+        })(),
+        fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lng+'&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max,windgusts_10m_max,weathercode,et0_fao_evapotranspiration&current_weather=true&past_days=30&forecast_days=7&timezone=Europe/Paris').then(r=>r.json()),
+        fetch(sinUrl).then(r=>r.json()),
+      ]);
+      _cacheSet(_sheetCache,_ck,{geo,rpgWfs,wx,sinR});
+    }
 
     let commune='—', communeCP='—';
     if(geo.status==='fulfilled'&&geo.value?.address){
@@ -5129,14 +5170,8 @@ async function openSheet(lat,lng){
     const coulCult=cC(codeRpg);
     const wxD=wx.status==='fulfilled'?wx.value:null;
 
-    // Sinistres 90j
-    const sinDate=new Date();sinDate.setDate(sinDate.getDate()-90);
-    let sinData=null;
-    try{
-      const sinParams=['temperature_2m_min','temperature_2m_max','precipitation_sum','precipitation_hours','windgusts_10m_max','et0_fao_evapotranspiration','snowfall_sum','showers_sum','weathercode'].join(',');
-      const r=await fetch('https://archive-api.open-meteo.com/v1/archive?latitude='+lat+'&longitude='+lng+'&start_date='+sinDate.toISOString().split('T')[0]+'&end_date='+new Date().toISOString().split('T')[0]+'&daily='+sinParams+'&timezone=Europe/Paris');
-      sinData=await r.json();
-    }catch(e){}
+    // Sinistres 90j — récupéré en parallèle plus haut
+    const sinData=sinR?.status==='fulfilled'?sinR.value:null;
     const sin=sinData?.daily;
     let gelJours=0,gelSevere=0,gelDates=[];
     let orageDates=[],secConsec=0,secConsecMax=0,etpTotal=0,precTotal=0;
@@ -5955,6 +5990,7 @@ let lastFetch=Date.now();
 let _fetchDatesTimer=null;
 map.on('moveend',()=>{clearTimeout(_fetchDatesTimer);_fetchDatesTimer=setTimeout(()=>{fetchDates();lastFetch=Date.now();},1500);});
 setInterval(async()=>{
+  if(!ndviOpen) return; // inutile de poller si NDVI non actif
   if(Date.now()-lastFetch>3600000){
     const old=dates[0];await fetchDates();lastFetch=Date.now();
     if(dates[0]&&dates[0]!==old) showToast('🆕 Nouvelle image Sentinel-2 — '+dates[0]); const _tk=document.getElementById('tk-ndvi'); if(_tk) _tk.dataset.new='1';
@@ -5966,10 +6002,7 @@ document.addEventListener('visibilitychange',async()=>{
 
 // ── Init au load ──
 window.addEventListener('load',()=>{
-  setTimeout(()=>map.invalidateSize(),100);
-
-  setTimeout(()=>map.invalidateSize(),500);
-  setTimeout(()=>map.invalidateSize(),1500);
+  setTimeout(()=>map.invalidateSize(),200);
   syncBaseUI();
   if(ndviOpen){const ovN=document.getElementById('ov-ndvi');if(ovN) ovN.classList.add('on');}
   fetchDates();
