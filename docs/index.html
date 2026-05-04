@@ -803,9 +803,8 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .sin-detail.open .sin-chevron{transform:rotate(180deg);}
 .sin-detail-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
 
-/* ── Sin-pane : header risque full-width sans hack ── */
+/* ── Sin-pane layout ── */
 .sin-pane{padding:0;}
-.sin-pane>*:not(:first-child){padding-left:14px;padding-right:14px;}
 .sin-risk-row{padding:10px 14px;}
 .sin-detail{margin:0 14px 8px;}
 
@@ -962,6 +961,115 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
   .hdr{padding:0 8px;}
   .hdr-search{max-width:160px;}
 }
+
+/* ═══════════════════════════════════════════════════════════
+   REDESIGN v7 — panes sombres (sinistres, météo, NDVI)
+═══════════════════════════════════════════════════════════ */
+
+/* ── Barre mode NDVI (remplace inline style) ── */
+.ndvi-mode-bar-hdr{display:flex;gap:6px;padding:8px 12px;background:#0d1117;border-bottom:1px solid rgba(255,255,255,.08);align-items:center;flex-shrink:0;}
+.ndvi-mode-bar-hdr-lbl{font-size:9px;color:rgba(255,255,255,.3);font-family:var(--mono);}
+
+/* ── Sinistres — hero (score global) ── */
+.sin-hero{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.08);}
+.sin-hero--low{background:linear-gradient(135deg,rgba(46,125,50,.2),rgba(46,125,50,.06));}
+.sin-hero--medium{background:linear-gradient(135deg,rgba(245,127,23,.2),rgba(245,127,23,.07));}
+.sin-hero--high{background:linear-gradient(135deg,rgba(230,81,0,.22),rgba(230,81,0,.07));}
+.sin-hero--critical{background:linear-gradient(135deg,rgba(183,28,28,.3),rgba(183,28,28,.1));}
+.sin-hero-kpi-wrap{display:flex;flex-direction:column;}
+.sin-hero-kpi-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px;}
+.sin-hero-score{font-size:38px;font-weight:800;color:white;font-family:var(--font);line-height:1;}
+.sin-hero-score span{font-size:13px;font-weight:500;opacity:.55;}
+.sin-hero-right{text-align:right;}
+.sin-hero-label{font-size:19px;font-weight:800;color:white;font-family:var(--font);}
+.sin-hero-period{font-size:8px;color:rgba(255,255,255,.4);margin-top:3px;font-family:var(--mono);}
+
+/* ── Sinistres — cards 2×2 ── */
+.sin-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px 14px;}
+.sin-card{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.06);border-radius:10px;padding:10px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.sin-card--frost{border-color:rgba(21,101,192,.4);background:rgba(21,101,192,.08);}
+.sin-card--storm{border-color:rgba(255,152,0,.4);background:rgba(255,152,0,.08);}
+.sin-card--drought{border-color:rgba(245,127,23,.4);background:rgba(245,127,23,.08);}
+.sin-card--hail{border-color:rgba(142,36,170,.4);background:rgba(142,36,170,.08);}
+.sin-card-icon{font-size:18px;}
+.sin-card-val{font-size:24px;font-weight:800;color:rgba(255,255,255,.25);font-family:var(--font);line-height:1;}
+.sin-card-val--frost{color:#64b5f6;}
+.sin-card-val--storm{color:#ffb74d;}
+.sin-card-val--drought{color:#ffa726;}
+.sin-card-val--hail{color:#ce93d8;}
+.sin-card-lbl{font-size:9px;color:rgba(255,255,255,.4);font-family:var(--mono);}
+.sin-card-sub{font-size:8px;color:rgba(255,255,255,.25);font-family:var(--mono);}
+.sin-card-sub--alert{color:#ef9a9a;}
+
+/* ── Sinistres — accordéons sombres ── */
+.sin-pane .sin-detail{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-radius:10px;}
+.sin-pane .sin-detail-body{color:rgba(255,255,255,.6);}
+.sin-pane .sin-detail-name{color:rgba(255,255,255,.75);}
+.sin-pane .sin-chevron{color:rgba(255,255,255,.25);}
+.sin-ic--frost{background:rgba(21,101,192,.2);}
+.sin-ic--storm{background:rgba(255,152,0,.2);}
+.sin-ic--drought{background:rgba(245,127,23,.2);}
+.sin-ic--hail{background:rgba(142,36,170,.2);}
+.sin-pane .sin-row{border-bottom:1px solid rgba(255,255,255,.06);}
+.sin-pane .sin-row-k{color:rgba(255,255,255,.4);}
+.sin-pane .sin-row-v{color:rgba(255,255,255,.82);}
+.sin-pane .sin-tl-item{color:rgba(255,255,255,.5);font-family:var(--mono);}
+.sin-pane .sin-bar{background:rgba(255,255,255,.08);}
+.sin-detail-note{font-size:9px;color:rgba(255,255,255,.3);font-family:var(--mono);margin-bottom:8px;display:block;}
+.sin-ext-link{font-size:9px;color:#64b5f6;display:inline-flex;align-items:center;gap:4px;text-decoration:none;}
+.sin-ext-link i{font-size:8px;}
+.sin-hydro-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0 12px;}
+.sin-hydro-cell{border-radius:8px;padding:8px;text-align:center;}
+.sin-hydro-cell--prec{background:rgba(21,101,192,.15);border:1px solid rgba(21,101,192,.2);}
+.sin-hydro-cell--etp{background:rgba(245,127,23,.15);border:1px solid rgba(245,127,23,.2);}
+.sin-hydro-cell--def{border-width:2px;border-style:solid;}
+.sin-hydro-lbl{font-size:9px;font-weight:600;font-family:var(--mono);}
+.sin-hydro-val{font-size:20px;font-weight:800;font-family:var(--font);line-height:1.2;margin:2px 0;}
+.sin-hydro-unit{font-size:8px;opacity:.7;font-family:var(--mono);}
+
+/* ── Météo pane — thème sombre ── */
+.wx-pane{background:#080e14!important;overflow-y:auto;}
+.wx-pane .wx-today-section{background:transparent!important;}
+.wx-pane .wx-today-grid{background:rgba(255,255,255,.04)!important;gap:1px;}
+.wx-pane .wx-today-cell{background:#0d1117!important;border-right:1px solid rgba(255,255,255,.06)!important;}
+.wx-pane .wx-today-val{color:rgba(255,255,255,.85)!important;}
+.wx-pane .wx-today-sub{color:rgba(255,255,255,.4)!important;}
+.wx-pane .wx-today-lbl{color:rgba(255,255,255,.25)!important;}
+.wx-pane .wx-section-title{background:transparent!important;color:rgba(255,255,255,.4)!important;border-top:1px solid rgba(255,255,255,.06)!important;border-bottom:none;padding:8px 12px 4px;}
+.wx-pane .wx-section-date{color:rgba(255,255,255,.65)!important;}
+.wx-pane .wx-current-bar{background:linear-gradient(90deg,rgba(27,94,32,.3),rgba(27,94,32,.1))!important;border-bottom:1px solid rgba(27,94,32,.2)!important;}
+.wx-pane .wx-current-temp{color:#81c784!important;}
+.wx-pane .wx-current-wind{color:rgba(255,255,255,.45)!important;}
+.wx-pane .wx-current-lbl{color:rgba(255,255,255,.3)!important;}
+.wx-pane .wx-strip{background:transparent!important;border-top:1px solid rgba(255,255,255,.06)!important;}
+.wx-pane .wx-day{border-right:1px solid rgba(255,255,255,.05)!important;}
+.wx-pane .wx-day-date{color:rgba(255,255,255,.35)!important;}
+.wx-pane .wx-day-hi{color:#ef9a9a!important;}
+.wx-pane .wx-day-lo{color:#90caf9!important;}
+.wx-pane .wx-day-rain{color:#64b5f6!important;}
+.wx-pane .wx-day-bar{background:rgba(255,255,255,.07)!important;}
+.wx-pane .wx-compare-wrap{background:transparent!important;}
+.wx-pane .wx-compare-title{color:rgba(255,255,255,.55)!important;}
+.wx-pane .wx-compare-period{color:rgba(255,255,255,.35)!important;}
+.wx-pane .wx-gauge-row{border-bottom:1px solid rgba(255,255,255,.06)!important;}
+.wx-pane .wx-gauge-lbl{color:rgba(255,255,255,.4)!important;}
+.wx-pane .wx-gauge-bar-wrap{background:rgba(255,255,255,.07)!important;}
+.wx-pane .wx-gauge-bar-norm{background:rgba(255,255,255,.2)!important;}
+.wx-pane .wx-gauge-cur{color:rgba(255,255,255,.85)!important;}
+.wx-pane .wx-gauge-norm{color:rgba(255,255,255,.35)!important;}
+.wx-pane .wx-gauge-item{border-bottom:1px solid rgba(255,255,255,.05)!important;}
+.wx-pane .wx-gauge-label{color:rgba(255,255,255,.35)!important;}
+.wx-pane .wx-gauge-unit{color:rgba(255,255,255,.3)!important;}
+.wx-pane .wx-gauge-norm-lbl,.wx-pane .wx-gauge-norm-val{color:rgba(255,255,255,.3)!important;}
+.wx-pane .wx-clim-wrap{border-bottom:1px solid rgba(255,255,255,.05);}
+.wx-pane .wx-clim-title{color:rgba(255,255,255,.55)!important;}
+.wx-pane .wx-clim-sub{color:rgba(255,255,255,.35)!important;}
+.wx-pane .wx-clim-unit{color:rgba(255,255,255,.3)!important;}
+.wx-pane .wx-clim-cell{background:rgba(255,255,255,.03)!important;border-color:rgba(255,255,255,.07)!important;}
+.wx-pane .wx-clim-grid{background:transparent;}
+.wx-pane .wx-period-sel{background:transparent!important;}
+.wx-pane .wx-psel-btn{background:rgba(255,255,255,.05)!important;border-color:rgba(255,255,255,.1)!important;color:rgba(255,255,255,.4)!important;}
+.wx-pane .wx-psel-btn.on{background:var(--gd)!important;color:white!important;border-color:var(--gd)!important;}
 
 </style>
 <body>
@@ -2042,6 +2150,7 @@ const GIBS    = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_
 // ── État global ──
 let tok=null, tokExp=0, dates=[], curIdx=0, maxCC=60;
 let ndviLyr=null, s2Lyr=null, ndviOpen=false, curBase='esri';
+let baseLyr=null; // couche de base courante gérée par setBase()
 let wxChart=null, ovState={cad:false,pac:false,sar:false,relief:false,grele:false,pedol:false,hydro:false,aoc:false}, datesMeta={};
 let _reliefLyr=null, _contourLyr=null;
 
@@ -3963,7 +4072,8 @@ function setBase(name){
   const card=document.getElementById('base-'+name);
   if(card) card.classList.add('on');
 
-  // Supprimer l'ancienne couche de base
+  // Supprimer l'ancienne couche de base (y compris la couche initiale)
+  if(activeTileLayer){ map.removeLayer(activeTileLayer); activeTileLayer=null; }
   if(baseLyr){ map.removeLayer(baseLyr); baseLyr=null; }
 
   const TILES={
@@ -3993,6 +4103,7 @@ function setBase(name){
   baseLyr.addTo(map);
   baseLyr.bringToBack();
   currentBase=name;
+  curBase=name;
   showToast('🗺 Fond: '+document.getElementById('base-'+name)?.querySelector('.gp-base-name')?.textContent||name);
 }
 function toggleBaseMap(name){ setBase(name); }
@@ -5476,11 +5587,11 @@ async function openSheet(lat,lng){
       // ONGLET NDVI
       '<div class="sh-pane on" id="pane-ndvi">'+
       // Barre sélection mode
-      '<div style="display:flex;gap:6px;padding:8px 12px;background:#0d1117;border-bottom:1px solid rgba(255,255,255,.08);align-items:center;">'+
+      '<div class="ndvi-mode-bar-hdr">'+
       '<button class="split-mode-btn on" id="btnModeNormal" onclick="setNdviViewMode(\'normal\',this)">Simple</button>'+
       '<button class="split-mode-btn" id="btnModeSplit" onclick="setNdviViewMode(\'split\',this)">Avant/Après</button>'+
       '<div style="flex:1;"></div>'+
-      '<span style="font-size:9px;color:rgba(255,255,255,.3);font-family:DM Mono,monospace;">MODE ANALYSE</span>'+
+      '<span class="ndvi-mode-bar-hdr-lbl">MODE ANALYSE</span>'+
       '</div>'+
       // Vue normale
       '<div id="ndviNormalView">'+
@@ -5593,36 +5704,138 @@ async function openSheet(lat,lng){
 
       // ONGLET SINISTRES
       '<div class="sh-pane" id="pane-sin"><div class="sin-pane">'+
-      // Score de risque global
-      '<div style="margin:-14px -14px 14px;padding:14px 16px;background:'+riskColor+';display:flex;align-items:center;justify-content:space-between;">'+
-        '<div>'+
-          '<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.8px;text-transform:uppercase;">Score de risque sinistre</div>'+
-          '<div style="font-size:24px;font-weight:800;color:white;font-family:Inter,sans-serif;line-height:1.1;">'+riskScore+'<span style="font-size:12px;font-weight:500;opacity:.8;">/100</span></div>'+
+      // Héro : score global
+      '<div class="sin-hero sin-hero--'+(riskScore>=70?'critical':riskScore>=40?'high':riskScore>=15?'medium':'low')+'">'+
+        '<div class="sin-hero-kpi-wrap">'+
+          '<div class="sin-hero-kpi-lbl">Score de risque</div>'+
+          '<div class="sin-hero-score">'+riskScore+'<span>/100</span></div>'+
         '</div>'+
-        '<div style="text-align:right;">'+
-          '<div style="font-size:16px;font-weight:800;color:white;font-family:Inter,sans-serif;">'+riskLabel+'</div>'+
-          '<div style="font-size:9px;color:rgba(255,255,255,.6);margin-top:3px;">90 derniers jours</div>'+
+        '<div class="sin-hero-right">'+
+          '<div class="sin-hero-label">'+riskLabel+'</div>'+
+          '<div class="sin-hero-period">90 derniers jours</div>'+
         '</div>'+
       '</div>'+
-      '<div class="sin-risk-row">'+
-      '<div class="sin-risk-card" style="background:'+(gelJours>3?'#e3f2fd':gelJours>0?'#e8f4fd':'#f5f5f5')+';border-color:'+(gelJours>0?'#1565c0':'#e0e0e0')+';border-width:2px;border-style:solid;"><div class="sin-risk-icon">🧊</div><div class="sin-risk-val" style="color:'+(gelJours>0?'#1565c0':'#b0bec5')+'">'+gelJours+'</div><div class="sin-risk-lbl">Jours gel</div><div class="sin-risk-sub" style="color:'+(gelSevere>0?'#c62828':'#90a4ae')+'">'+(gelSevere>0?gelSevere+' j ≤-3°C':'aucun')+'</div></div>'+
-      '<div class="sin-risk-card" style="background:'+(orageDates.length>0?'#fff3e0':'#f5f5f5')+';border-color:'+(orageDates.length>0?'#ff9800':'#e0e0e0')+';border-width:2px;border-style:solid;"><div class="sin-risk-icon">🌨</div><div class="sin-risk-val" style="color:'+(orageDates.length>0?'#e65100':'#b0bec5')+'">'+orageDates.length+'</div><div class="sin-risk-lbl">Épisodes</div><div class="sin-risk-sub" style="color:'+(orageDates.length>0?'#e65100':'#90a4ae')+'">'+(orageDates.length>0?'précip+vent':'aucun')+'</div></div>'+
-      '<div class="sin-risk-card" style="background:'+(parseFloat(deficit)>80?'#fff3e0':'#f5f5f5')+';border-color:'+secColor+';border-width:2px;border-style:solid;"><div class="sin-risk-icon">☀️</div><div class="sin-risk-val" style="color:'+secColor+'">'+deficit+'</div><div class="sin-risk-lbl">mm déficit</div><div class="sin-risk-sub" style="color:'+secColor+'">'+secRisque+'</div></div>'+
-      '<div class="sin-risk-card" style="background:'+(greleDates.length>2?'#f3e5f5':greleDates.length>0?'#fce4ec':'#f5f5f5')+';border-color:'+(greleDates.length>0?'#8e24aa':'#e0e0e0')+';border-width:2px;border-style:solid;"><div class="sin-risk-icon">🌨</div><div class="sin-risk-val" style="color:'+(greleDates.length>0?'#6a1b9a':'#b0bec5')+'">'+greleDates.length+'</div><div class="sin-risk-lbl">Épisodes grêle</div><div class="sin-risk-sub" style="color:'+(greleDates.length>0?'#8e24aa':'#90a4ae')+'">'+( greleDates.length>0?(greleDates.filter(g=>g.certain).length>0?greleDates.filter(g=>g.certain).length+' confirmé(s)':'estimés'):'aucun')+'</div></div>'+
+      // Cards 2×2
+      '<div class="sin-cards">'+
+        '<div class="sin-card'+(gelJours>0?' sin-card--frost':'')+'">'+
+          '<span class="sin-card-icon">🧊</span>'+
+          '<div class="sin-card-val'+(gelJours>0?' sin-card-val--frost':'')+'">'+gelJours+'</div>'+
+          '<div class="sin-card-lbl">Jours gel</div>'+
+          '<div class="sin-card-sub'+(gelSevere>0?' sin-card-sub--alert':'')+'">'+(gelSevere>0?gelSevere+' j ≤-3°C':'aucun')+'</div>'+
+        '</div>'+
+        '<div class="sin-card'+(orageDates.length>0?' sin-card--storm':'')+'">'+
+          '<span class="sin-card-icon">⛈</span>'+
+          '<div class="sin-card-val'+(orageDates.length>0?' sin-card-val--storm':'')+'">'+orageDates.length+'</div>'+
+          '<div class="sin-card-lbl">Épisodes vent</div>'+
+          '<div class="sin-card-sub">'+(orageDates.length>0?'précip+rafales':'aucun')+'</div>'+
+        '</div>'+
+        '<div class="sin-card'+(parseFloat(deficit)>30?' sin-card--drought':'')+'">'+
+          '<span class="sin-card-icon">☀️</span>'+
+          '<div class="sin-card-val'+(parseFloat(deficit)>30?' sin-card-val--drought':'')+'">'+deficit+'</div>'+
+          '<div class="sin-card-lbl">mm déficit</div>'+
+          '<div class="sin-card-sub'+(parseFloat(deficit)>80?' sin-card-sub--alert':'')+'">'+secRisque+'</div>'+
+        '</div>'+
+        '<div class="sin-card'+(greleDates.length>0?' sin-card--hail':'')+'">'+
+          '<span class="sin-card-icon">🌨</span>'+
+          '<div class="sin-card-val'+(greleDates.length>0?' sin-card-val--hail':'')+'">'+greleDates.length+'</div>'+
+          '<div class="sin-card-lbl">Épisodes grêle</div>'+
+          '<div class="sin-card-sub">'+(greleDates.length>0?(greleDates.filter(g=>g.certain).length>0?greleDates.filter(g=>g.certain).length+' confirmé(s)':'estimés'):'aucun')+'</div>'+
+        '</div>'+
       '</div>'+
-      '<div class="sin-detail'+(greleDates.length>0?' open':'')+'" id="sinDetGrele"><div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')"><div class="sin-detail-hdr-left"><div class="sin-detail-ic" style="background:#f3e5f5;">🌨</div><span class="sin-detail-name">Épisodes de grêle détectés</span></div><i class="fas fa-chevron-down sin-chevron"></i></div>'+
-      '<div class="sin-detail-body">'+
-      '<div style="font-size:9px;color:#90a4ae;margin-bottom:8px;">Code WMO 96/99 (orage avec grêle) + proxy : averses convectives &gt;5mm avec rafales &gt;50km/h</div>'+
-      (greleDates.length>0
-        ? greleDates.slice(0,8).map(g=>'<div class="sin-row"><span class="sin-row-k">'+g.d.split('-').slice(1).reverse().join('/')+'</span><span class="sin-row-v" style="color:'+(g.certain?'#6a1b9a':'#ab47bc')+';">'+(g.certain?'⚠️ ':'~')+g.p+'mm · '+g.w+'km/h'+(g.s>0?' · '+g.s+'mm averse':'')+'</span></div>').join('')
-        : '<div style="font-size:10px;color:#27ae60;padding:6px 0;">✅ Aucun épisode de grêle détecté</div>'
-      )+
-      '<div style="margin-top:8px;font-size:9px;color:#b0bec5;">⚠️ = confirmé WMO · ~ = estimé par proxy météo. Pour confirmation officielle :</div>'+
-      '<a href="https://keraunos.org/statistiques-orages/france.html" target="_blank" style="font-size:9px;color:#1565c0;display:inline-flex;align-items:center;gap:4px;margin-top:4px;"><i class="fas fa-external-link-alt"></i> Base Keraunos (orages France)</a>'+
-      '</div></div>'+
-      '<div class="sin-detail'+(gelJours>0?' open':'')+'" id="sinDetGel"><div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')"><div class="sin-detail-hdr-left"><div class="sin-detail-ic" style="background:#e3f2fd;">🧊</div><span class="sin-detail-name">Analyse gel</span></div><i class="fas fa-chevron-down sin-chevron"></i></div><div class="sin-detail-body"><div class="sin-row"><span class="sin-row-k">Jours gel (≤0°C)</span><span class="sin-row-v" style="color:#1565c0;">'+gelJours+' j</span></div><div class="sin-row"><span class="sin-row-k">Gel sévère (≤-3°C)</span><span class="sin-row-v" style="color:#c62828;">'+gelSevere+' j</span></div>'+(gelDates.length>0?'<div class="sin-tl">'+gelDates.map(g=>'<div class="sin-tl-item"><div class="sin-tl-dot" style="background:'+(g.t<=-5?'#c62828':g.t<=-3?'#1565c0':'#64b5f6')+'"></div><span>'+g.d.split('-').slice(1).reverse().join('/')+' — '+g.t.toFixed(1)+'°C</span></div>').join('')+'</div>':'<div style="font-size:10px;color:#27ae60;padding:6px 0;">✅ Aucun gel sur 90 jours</div>')+'</div></div>'+
-      '<div class="sin-detail'+(orageDates.length>0?' open':'')+'" id="sinDetPrecip"><div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')"><div class="sin-detail-hdr-left"><div class="sin-detail-ic" style="background:#fff3e0;">🌨</div><span class="sin-detail-name">Précipitations intenses & Vent</span></div><i class="fas fa-chevron-down sin-chevron"></i></div><div class="sin-detail-body"><div style="font-size:9px;color:#90a4ae;margin-bottom:8px;">Épisodes : précip >15mm ET rafales >60 km/h</div>'+(orageDates.length>0?orageDates.slice(0,6).map(o=>'<div class="sin-row"><span class="sin-row-k">'+o.d.split('-').slice(1).reverse().join('/')+'</span><span class="sin-row-v" style="color:#e65100;">'+o.p+' mm · '+o.w+' km/h</span></div>').join(''):'<div style="font-size:10px;color:#27ae60;padding:6px 0;">Aucun épisode détecté</div>')+'<a href="https://www.georisques.gouv.fr/risques/catnat" target="_blank" style="font-size:9px;color:#1565c0;display:inline-flex;align-items:center;gap:4px;margin-top:6px;"><i class="fas fa-external-link-alt"></i> Vérifier CatNat</a></div></div>'+
-      '<div class="sin-detail open" id="sinDetSec"><div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')"><div class="sin-detail-hdr-left"><div class="sin-detail-ic" style="background:#fff8e1;">☀️</div><span class="sin-detail-name">Bilan hydrique — 90 jours</span></div><i class="fas fa-chevron-down sin-chevron"></i></div><div class="sin-detail-body"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0 10px;"><div style="background:#e3f2fd;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:9px;color:#1565c0;font-weight:600;">Cumul 30j</div><div style="font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:#1565c0;">'+precTotal.toFixed(0)+'</div><div style="font-size:8px;color:#1565c0;opacity:.7;">mm</div></div><div style="background:#fff8e1;border-radius:8px;padding:8px;text-align:center;"><div style="font-size:9px;color:#f57f17;font-weight:600;">ETP 30j</div><div style="font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:#f57f17;">'+etpTotal.toFixed(0)+'</div><div style="font-size:8px;color:#f57f17;opacity:.7;">mm</div></div><div style="background:'+(parseFloat(deficit)>80?'#fff3e0':'#e8f5e9')+';border-radius:8px;padding:8px;text-align:center;border:2px solid '+secColor+';"><div style="font-size:9px;color:'+secColor+';font-weight:600;">Déficit</div><div style="font-family:Inter,sans-serif;font-weight:800;font-size:18px;color:'+secColor+';">'+deficit+'</div><div style="font-size:8px;color:'+secColor+';opacity:.8;">mm</div></div></div><div class="sin-row"><span class="sin-row-k">Précipitations 90j</span><span class="sin-row-v" style="color:#1565c0;">'+precTotal.toFixed(0)+' mm</span></div><div class="sin-row"><span class="sin-row-k">ETP 90j</span><span class="sin-row-v" style="color:#ff9800;">'+etpTotal.toFixed(0)+' mm</span></div><div class="sin-row" style="padding-top:8px;border-top:2px solid #eee;"><span class="sin-row-k" style="font-weight:700;">Déficit (ETP−Précip)</span><span class="sin-row-v" style="font-size:15px;color:'+secColor+';">'+deficit+' mm</span></div><div style="margin-top:8px;"><div style="display:flex;justify-content:space-between;font-size:9px;color:#90a4ae;margin-bottom:4px;"><span>Risque</span><span style="color:'+secColor+';font-weight:700;">'+secRisque+'</span></div><div class="sin-bar"><div class="sin-bar-fill" style="width:'+Math.min(parseFloat(deficit)/200*100,100)+'%;background:'+secColor+';"></div></div></div><div class="sin-row" style="margin-top:6px;"><span class="sin-row-k">Séquence sèche max</span><span class="sin-row-v">'+secConsecMax+' j</span></div></div></div>'+
+      // Accordéon : Grêle
+      '<div class="sin-detail'+(greleDates.length>0?' open':'')+'" id="sinDetGrele">'+
+        '<div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')">'+
+          '<div class="sin-detail-hdr-left"><div class="sin-detail-ic sin-ic--hail">🌨</div><span class="sin-detail-name">Épisodes de grêle détectés</span></div>'+
+          '<i class="fas fa-chevron-down sin-chevron"></i>'+
+        '</div>'+
+        '<div class="sin-detail-body">'+
+          '<span class="sin-detail-note">Code WMO 96/99 + proxy : averses &gt;5mm avec rafales &gt;50 km/h</span>'+
+          (greleDates.length>0
+            ? greleDates.slice(0,8).map(g=>
+                '<div class="sin-row"><span class="sin-row-k">'+g.d.split('-').slice(1).reverse().join('/')+'</span>'+
+                '<span class="sin-row-v" style="color:'+(g.certain?'#ce93d8':'#ba68c8')+';">'+(g.certain?'⚠️ ':'~')+g.p+'mm · '+g.w+'km/h'+(g.s>0?' · '+g.s+'mm':'')+'</span></div>'
+              ).join('')
+            : '<div style="font-size:10px;color:#66bb6a;padding:6px 0;">✅ Aucun épisode de grêle détecté</div>'
+          )+
+          '<span class="sin-detail-note" style="margin-top:8px;">⚠️ = confirmé WMO · ~ = estimé par proxy</span>'+
+          '<a href="https://keraunos.org/statistiques-orages/france.html" target="_blank" class="sin-ext-link"><i class="fas fa-external-link-alt"></i> Base Keraunos (orages France)</a>'+
+        '</div>'+
+      '</div>'+
+      // Accordéon : Gel
+      '<div class="sin-detail'+(gelJours>0?' open':'')+'" id="sinDetGel">'+
+        '<div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')">'+
+          '<div class="sin-detail-hdr-left"><div class="sin-detail-ic sin-ic--frost">🧊</div><span class="sin-detail-name">Analyse gel</span></div>'+
+          '<i class="fas fa-chevron-down sin-chevron"></i>'+
+        '</div>'+
+        '<div class="sin-detail-body">'+
+          '<div class="sin-row"><span class="sin-row-k">Jours gel (≤0°C)</span><span class="sin-row-v" style="color:#64b5f6;">'+gelJours+' j</span></div>'+
+          '<div class="sin-row"><span class="sin-row-k">Gel sévère (≤-3°C)</span><span class="sin-row-v" style="color:#ef5350;">'+gelSevere+' j</span></div>'+
+          (gelDates.length>0
+            ? '<div class="sin-tl">'+gelDates.map(g=>
+                '<div class="sin-tl-item"><div class="sin-tl-dot" style="background:'+(g.t<=-5?'#ef5350':g.t<=-3?'#64b5f6':'#90caf9')+'"></div>'+
+                '<span>'+g.d.split('-').slice(1).reverse().join('/')+' — '+g.t.toFixed(1)+'°C</span></div>'
+              ).join('')+'</div>'
+            : '<div style="font-size:10px;color:#66bb6a;padding:6px 0;">✅ Aucun gel sur 90 jours</div>'
+          )+
+        '</div>'+
+      '</div>'+
+      // Accordéon : Précipitations & Vent
+      '<div class="sin-detail'+(orageDates.length>0?' open':'')+'" id="sinDetPrecip">'+
+        '<div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')">'+
+          '<div class="sin-detail-hdr-left"><div class="sin-detail-ic sin-ic--storm">⛈</div><span class="sin-detail-name">Précipitations intenses & Vent</span></div>'+
+          '<i class="fas fa-chevron-down sin-chevron"></i>'+
+        '</div>'+
+        '<div class="sin-detail-body">'+
+          '<span class="sin-detail-note">Épisodes : précip &gt;15mm ET rafales &gt;60 km/h</span>'+
+          (orageDates.length>0
+            ? orageDates.slice(0,6).map(o=>
+                '<div class="sin-row"><span class="sin-row-k">'+o.d.split('-').slice(1).reverse().join('/')+'</span>'+
+                '<span class="sin-row-v" style="color:#ffb74d;">'+o.p+' mm · '+o.w+' km/h</span></div>'
+              ).join('')
+            : '<div style="font-size:10px;color:#66bb6a;padding:6px 0;">Aucun épisode détecté</div>'
+          )+
+          '<a href="https://www.georisques.gouv.fr/risques/catnat" target="_blank" class="sin-ext-link" style="margin-top:6px;"><i class="fas fa-external-link-alt"></i> Vérifier CatNat</a>'+
+        '</div>'+
+      '</div>'+
+      // Accordéon : Bilan hydrique
+      '<div class="sin-detail open" id="sinDetSec">'+
+        '<div class="sin-detail-hdr" onclick="this.parentElement.classList.toggle(\'open\')">'+
+          '<div class="sin-detail-hdr-left"><div class="sin-detail-ic sin-ic--drought">☀️</div><span class="sin-detail-name">Bilan hydrique — 90 jours</span></div>'+
+          '<i class="fas fa-chevron-down sin-chevron"></i>'+
+        '</div>'+
+        '<div class="sin-detail-body">'+
+          '<div class="sin-hydro-grid">'+
+            '<div class="sin-hydro-cell sin-hydro-cell--prec">'+
+              '<div class="sin-hydro-lbl" style="color:#64b5f6;">Cumul 30j</div>'+
+              '<div class="sin-hydro-val" style="color:#64b5f6;">'+precTotal.toFixed(0)+'</div>'+
+              '<div class="sin-hydro-unit" style="color:#64b5f6;">mm</div>'+
+            '</div>'+
+            '<div class="sin-hydro-cell sin-hydro-cell--etp">'+
+              '<div class="sin-hydro-lbl" style="color:#ffa726;">ETP 30j</div>'+
+              '<div class="sin-hydro-val" style="color:#ffa726;">'+etpTotal.toFixed(0)+'</div>'+
+              '<div class="sin-hydro-unit" style="color:#ffa726;">mm</div>'+
+            '</div>'+
+            '<div class="sin-hydro-cell sin-hydro-cell--def" style="background:'+(parseFloat(deficit)>80?'rgba(198,40,40,.15)':'rgba(46,125,50,.15)')+';border-color:'+(parseFloat(deficit)>80?'rgba(198,40,40,.3)':'rgba(46,125,50,.3)')+';">'+
+              '<div class="sin-hydro-lbl" style="color:'+secColor+';">Déficit</div>'+
+              '<div class="sin-hydro-val" style="color:'+secColor+';">'+deficit+'</div>'+
+              '<div class="sin-hydro-unit" style="color:'+secColor+';">mm</div>'+
+            '</div>'+
+          '</div>'+
+          '<div class="sin-row"><span class="sin-row-k">Précipitations 90j</span><span class="sin-row-v" style="color:#64b5f6;">'+precTotal.toFixed(0)+' mm</span></div>'+
+          '<div class="sin-row"><span class="sin-row-k">ETP 90j</span><span class="sin-row-v" style="color:#ffa726;">'+etpTotal.toFixed(0)+' mm</span></div>'+
+          '<div class="sin-row" style="padding-top:8px;border-top:1px solid rgba(255,255,255,.1);margin-top:4px;">'+
+            '<span class="sin-row-k" style="color:rgba(255,255,255,.7);font-weight:700;">Déficit (ETP−Précip)</span>'+
+            '<span class="sin-row-v" style="font-size:15px;color:'+secColor+';">'+deficit+' mm</span>'+
+          '</div>'+
+          '<div style="margin-top:8px;">'+
+            '<div style="display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);margin-bottom:4px;">'+
+              '<span style="color:rgba(255,255,255,.35);">Risque sécheresse</span><span style="color:'+secColor+';font-weight:700;">'+secRisque+'</span>'+
+            '</div>'+
+            '<div class="sin-bar"><div class="sin-bar-fill" style="width:'+Math.min(parseFloat(deficit)/200*100,100)+'%;background:'+secColor+';"></div></div>'+
+          '</div>'+
+          '<div class="sin-row" style="margin-top:6px;"><span class="sin-row-k">Séquence sèche max</span><span class="sin-row-v">'+secConsecMax+' j</span></div>'+
+        '</div>'+
+      '</div>'+
       '</div></div>'+
 
       // ONGLET MÉTÉO
@@ -5631,7 +5844,7 @@ async function openSheet(lat,lng){
       '<div id="wxClimRef">'+(wxD?buildClimatRef(wxD,null,lat,lng):'')+'</div>'+
       (wxD?buildWxToday(wxD):'')+
       '<div id="wxForecastSection">'
-      +'<div class="wx-section-title" style="padding:8px 12px 4px;">Prévisions météo<span class="wx-section-date" id="wxForecastPeriod">14 jours</span></div>'
+      +'<div class="wx-section-title">Prévisions météo<span class="wx-section-date" id="wxForecastPeriod">14 jours</span></div>'
       +'<div class="wx-strip" id="wxForecastStrip">'+(wxD?renderWx(wxD,14):'')+'</div>'
       +'</div>'+
       '</div></div>'+
@@ -6326,7 +6539,7 @@ function drawNdviGraph(wxData){
 // ── moveend / auto-refresh ──
 let lastFetch=Date.now();
 let _fetchDatesTimer=null;
-map.on('moveend',()=>{clearTimeout(_fetchDatesTimer);_fetchDatesTimer=setTimeout(()=>{fetchDates();lastFetch=Date.now();},1500);});
+map.on('moveend',()=>{if(!ndviOpen) return; clearTimeout(_fetchDatesTimer);_fetchDatesTimer=setTimeout(()=>{fetchDates();lastFetch=Date.now();},1500);});
 setInterval(async()=>{
   if(!ndviOpen) return; // inutile de poller si NDVI non actif
   if(Date.now()-lastFetch>3600000){
