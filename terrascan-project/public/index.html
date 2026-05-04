@@ -3653,8 +3653,8 @@ function setBaseOpacity(n,val){
 
 // ── Couches superposées ──
 const ovL={
-  cad:L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELS&STYLE=bdparcellaire&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{attribution:'© IGN',maxZoom:20,opacity:.75}),
-  pac:L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=LANDUSE.AGRICULTURE.LATEST&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{attribution:'© IGN RPG',maxZoom:20,opacity:.55}),
+  cad:L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELS&STYLE=bdparcellaire&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{attribution:'© IGN',maxZoom:20,maxNativeZoom:19,keepBuffer:4,opacity:.75}),
+  pac:L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=LANDUSE.AGRICULTURE.LATEST&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}',{attribution:'© IGN RPG',maxZoom:20,maxNativeZoom:18,keepBuffer:4,opacity:.55}),
   sar:null,
   catnat:null
 };
@@ -4102,6 +4102,7 @@ function setBase(name){
   baseLyr=L.tileLayer(t.url,{maxZoom:t.maxZoom,attribution:t.attr});
   baseLyr.addTo(map);
   baseLyr.bringToBack();
+  bringTop(); // réaffirmer l'ordre des couches superposées actives
   currentBase=name;
   curBase=name;
   showToast('🗺 Fond: '+document.getElementById('base-'+name)?.querySelector('.gp-base-name')?.textContent||name);
@@ -4277,6 +4278,7 @@ async function fetchDates(){
   const note=document.getElementById('ndvNote');
   if(dot) dot.className='tdot load';
   if(st) st.textContent='Chargement images satellite…';
+  const _prevDate0=dates.length>0?dates[0]:null; // pour détecter si la date la plus récente change
 
   // Retry jusqu'à 3 fois avec délai exponentiel
   for(let attempt=0;attempt<3;attempt++){
@@ -4325,7 +4327,9 @@ async function fetchDates(){
         if(note) note.textContent='✅ '+dates.length+' images · '+dates[0];
         // Ne mettre à jour la timeline que si la barre NDVI est ouverte
         if(ndviOpen) updateNdviTimeline();
-        applyDate(dates[0]);
+        // Ne recharger la couche NDVI que si la date la plus récente a changé
+        // (évite de recréer la couche WMS sur chaque zoom → flash visuel)
+        if(dates[0]!==_prevDate0) applyDate(dates[0]);
       } else {
         if(note) note.textContent='⚠️ Aucune image (nuages > '+maxCC+'%)';
         if(st) st.textContent='Augmentez le seuil nuages';
@@ -6539,7 +6543,17 @@ function drawNdviGraph(wxData){
 // ── moveend / auto-refresh ──
 let lastFetch=Date.now();
 let _fetchDatesTimer=null;
-map.on('moveend',()=>{if(!ndviOpen) return; clearTimeout(_fetchDatesTimer);_fetchDatesTimer=setTimeout(()=>{fetchDates();lastFetch=Date.now();},1500);});
+let _lastFetchCenter=''; // évite de refetcher si on zoome sans bouger
+map.on('moveend',()=>{
+  if(!ndviOpen) return;
+  // Ne re-fetcher les dates que si le centre a réellement bougé (~1km)
+  const c=map.getCenter();
+  const centerKey=c.lat.toFixed(2)+','+c.lng.toFixed(2);
+  if(centerKey===_lastFetchCenter) return;
+  _lastFetchCenter=centerKey;
+  clearTimeout(_fetchDatesTimer);
+  _fetchDatesTimer=setTimeout(()=>{fetchDates();lastFetch=Date.now();},1500);
+});
 setInterval(async()=>{
   if(!ndviOpen) return; // inutile de poller si NDVI non actif
   if(Date.now()-lastFetch>3600000){
