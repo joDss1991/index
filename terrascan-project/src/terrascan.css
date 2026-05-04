@@ -536,7 +536,7 @@ html,body{height:100%;overflow:hidden;display:flex;flex-direction:column;font-fa
 .sh-pane.on{display:flex;flex-direction:column;flex:1;min-height:0;}
 
 /* Panes avec scroll interne */
-#pane-ndvi{overflow-y:auto;}
+#pane-ndvi{overflow-y:auto;background:var(--bg-dark);}
 #pane-expert .expert-pane{overflow-y:auto;flex:1;}
 #pane-sin .sin-pane{overflow-y:auto;flex:1;}
 #pane-wx .wx-pane{overflow-y:auto;flex:1;}
