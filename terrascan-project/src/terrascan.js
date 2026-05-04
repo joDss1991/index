@@ -2626,7 +2626,7 @@ function buildClimatRef(wxD, norms, lat, lng){
 
   return '<div class="wx-clim-wrap">'
     +'<div class="wx-clim-title">Normales climatiques <span>'+nomMois+'</span>'
-    +' <span style="background:#e8f5e9;color:#2e7d32;">ERA5 · 1991-2020</span></div>'
+    +' <span style="background:rgba(45,189,138,.12);color:var(--accent);border-radius:3px;padding:1px 5px;font-size:7px;">ERA5 · 1991-2020</span></div>'
     +'<div class="wx-clim-grid">'
 
     // Cumul précip mensuel
@@ -3111,7 +3111,6 @@ function shTab(name,el){
   if(pane) pane.classList.add('on');
 
   if(name==='ndvi'){
-    // Attendre que le pane soit visible
     setTimeout(()=>{
       const lat=window._ndviParcelLat, lng=window._ndviParcelLng;
       if(!lat||!lng) return;
@@ -3122,9 +3121,10 @@ function shTab(name,el){
         if(!_ndviParcelLayer) loadNdviOnParcel();
       }
     },80);
-  } else if(name==='wx'){
-    // Redessiner les graphiques météo si nécessaire
-    if(window._wx) setTimeout(()=>drawWxCWithNorms(window._wx,7),80);
+  } else {
+    // Nettoyer la couche NDVI parcel pour éviter la persistance visuelle
+    if(_ndviParcelLayer){try{if(_ndviParcelMap) _ndviParcelMap.removeLayer(_ndviParcelLayer);}catch(e){} _ndviParcelLayer=null;}
+    if(name==='wx' && window._wx) setTimeout(()=>drawWxCWithNorms(window._wx,7),80);
   }
 }
 
@@ -3676,13 +3676,6 @@ async function openSheet(lat,lng){
 
       // ONGLET NDVI
       '<div class="sh-pane on" id="pane-ndvi">'+
-      // Barre sélection mode
-      '<div class="ndvi-mode-bar-hdr">'+
-      '<button class="split-mode-btn on" id="btnModeNormal" onclick="setNdviViewMode(\'normal\',this)">Simple</button>'+
-      '<button class="split-mode-btn" id="btnModeSplit" onclick="setNdviViewMode(\'split\',this)">Avant/Après</button>'+
-      '<div style="flex:1;"></div>'+
-      '<span class="ndvi-mode-bar-hdr-lbl">MODE ANALYSE</span>'+
-      '</div>'+
       // Vue normale
       '<div id="ndviNormalView">'+
       '<div class="ndvi-map-wrap"><div id="ndviParcelMap"></div>'+
